@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Retail Inventory Pro</title>
+<title>Retail Inventory</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -11,13 +11,13 @@
 body{
 font-family:Segoe UI;
 margin:0;
-background:#f1f3f6;
+background:#eef1f5;
 }
 
 header{
-background:#1f2937;
+background:#111827;
 color:white;
-padding:15px 20px;
+padding:15px;
 font-size:20px;
 }
 
@@ -25,52 +25,31 @@ font-size:20px;
 padding:20px;
 }
 
-/* ALERT PANEL */
-
-.alert-panel{
-background:#fff3cd;
-border-left:6px solid #f59e0b;
-padding:15px;
-margin-bottom:20px;
-border-radius:8px;
-}
-
-.alert-title{
-font-weight:bold;
-margin-bottom:10px;
-}
-
-.alert-item{
-padding:8px;
-border-bottom:1px solid #eee;
-}
-
-/* CARD */
-
 .card{
 background:white;
-padding:20px;
-border-radius:10px;
+padding:18px;
 margin-bottom:20px;
-box-shadow:0 2px 6px rgba(0,0,0,0.08);
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
 
 button{
 background:#2563eb;
 color:white;
 border:none;
-padding:10px 16px;
+padding:10px 15px;
 border-radius:6px;
 cursor:pointer;
+margin:4px;
 }
 
 button:hover{
-background:#1d4ed8;
+background:#1e40af;
 }
 
 input{
-padding:10px;
-margin:5px;
+padding:9px;
+margin:4px;
 }
 
 table{
@@ -80,17 +59,29 @@ margin-top:10px;
 }
 
 th,td{
-border:1px solid #eee;
 padding:10px;
+border:1px solid #ddd;
 }
 
 th{
-background:#111827;
+background:#1f2937;
 color:white;
 }
 
+.alert{
+background:#fff3cd;
+border-left:6px solid orange;
+padding:10px;
+border-radius:6px;
+}
+
 #reader{
-width:320px;
+width:300px;
+}
+
+.stat{
+font-size:18px;
+margin:4px;
 }
 
 </style>
@@ -105,13 +96,9 @@ Retail Inventory Dashboard
 
 <div class="container">
 
-<!-- ALERT EXP PANEL -->
+<div class="card alert">
 
-<div class="alert-panel">
-
-<div class="alert-title">
-⚠ Barang Mendekati Expired
-</div>
+<b>Barang Mendekati Expired</b>
 
 <div id="alertList">
 Belum ada barang mendekati expired
@@ -119,17 +106,23 @@ Belum ada barang mendekati expired
 
 </div>
 
-<!-- MENU -->
+<div class="card">
+
+<div class="stat">Total Barang: <span id="total"></span></div>
+
+<div class="stat">Hampir Expired: <span id="expCount"></span></div>
+
+</div>
 
 <div class="card">
 
 <button onclick="show('add')">Tambah Barang</button>
+
 <button onclick="show('scan')">Scan Barcode</button>
-<button onclick="show('stock')">Stok Barang</button>
+
+<button onclick="show('stock')">Lihat Stok</button>
 
 </div>
-
-<!-- TAMBAH -->
 
 <div class="card" id="add">
 
@@ -147,7 +140,7 @@ Belum ada barang mendekati expired
 
 <br>
 
-<label>Tanggal Expired</label>
+<label>Expired</label>
 
 <input id="exp" type="date">
 
@@ -156,8 +149,6 @@ Belum ada barang mendekati expired
 <button onclick="addItem()">Simpan</button>
 
 </div>
-
-<!-- SCAN -->
 
 <div class="card" id="scan" style="display:none">
 
@@ -171,17 +162,16 @@ Belum ada barang mendekati expired
 
 </div>
 
-<!-- STOK -->
-
 <div class="card" id="stock" style="display:none">
 
 <h3>Daftar Stok</h3>
 
-<input id="search" placeholder="Cari..." onkeyup="searchItem()">
+<input id="search" placeholder="Cari barang..." onkeyup="searchItem()">
 
 <table>
 
 <thead>
+
 <tr>
 <th>Barcode</th>
 <th>Nama</th>
@@ -190,6 +180,7 @@ Belum ada barang mendekati expired
 <th>Baris</th>
 <th>Expired</th>
 </tr>
+
 </thead>
 
 <tbody id="stockTable"></tbody>
@@ -202,23 +193,15 @@ Belum ada barang mendekati expired
 
 <script>
 
-/* =====================
-DATABASE
-===================== */
-
 let items = JSON.parse(localStorage.getItem("items")) || []
 
-let warningDays = 30   // H-30 rule
+let warningDays = 30
 
 function saveDB(){
 
 localStorage.setItem("items",JSON.stringify(items))
 
 }
-
-/* =====================
-ADD ITEM
-===================== */
 
 function addItem(){
 
@@ -237,21 +220,15 @@ items.push(item)
 
 saveDB()
 
-alert("Barang tersimpan")
+loadData()
 
-loadStock()
+alert("Barang tersimpan")
 
 }
 
-/* =====================
-LOAD STOCK
-===================== */
-
-function loadStock(){
+function loadData(){
 
 let table=document.getElementById("stockTable")
-
-if(!table) return
 
 table.innerHTML=""
 
@@ -274,13 +251,11 @@ table.innerHTML+=`
 
 })
 
-checkAlert()
+document.getElementById("total").innerText=items.length
+
+checkExpired()
 
 }
-
-/* =====================
-SEARCH
-===================== */
 
 function searchItem(){
 
@@ -294,11 +269,7 @@ r.style.display=r.innerText.toLowerCase().includes(key) ? "" : "none"
 
 }
 
-/* =====================
-ALERT EXPIRED PANEL
-===================== */
-
-function checkAlert(){
+function checkExpired(){
 
 let today=new Date()
 
@@ -306,26 +277,24 @@ let panel=document.getElementById("alertList")
 
 panel.innerHTML=""
 
-let found=false
+let count=0
 
 items.forEach(i=>{
 
 let expDate=new Date(i.exp)
 
-let diff=(expDate - today)/(1000*60*60*24)
+let diff=(expDate-today)/(1000*60*60*24)
 
-if(diff <= warningDays+1){
+if(diff<=warningDays){
 
-found=true
+count++
 
 panel.innerHTML+=`
 
-<div class="alert-item">
+<div>
 
-<b>${i.nama}</b> akan expired dalam 
-<b>${Math.floor(diff)} hari</b>
-
-(Rak ${i.rak} - Baris ${i.baris})
+${i.nama} - Expired ${Math.floor(diff)} hari lagi
+(Rak ${i.rak} Baris ${i.baris})
 
 </div>
 
@@ -335,17 +304,15 @@ panel.innerHTML+=`
 
 })
 
-if(!found){
+if(count==0){
 
 panel.innerHTML="Tidak ada barang mendekati expired"
 
 }
 
-}
+document.getElementById("expCount").innerText=count
 
-/* =====================
-SCANNER
-===================== */
+}
 
 let scanner
 
@@ -369,25 +336,19 @@ scanner.stop()
 
 }
 
-/* =====================
-NAVIGATION
-===================== */
-
 function show(id){
 
 ["add","scan","stock"].forEach(s=>{
+
 document.getElementById(s).style.display="none"
+
 })
 
 document.getElementById(id).style.display="block"
 
 }
 
-/* =====================
-INIT
-===================== */
-
-loadStock()
+loadData()
 
 </script>
 

@@ -27,7 +27,7 @@ padding:20px;
 
 .card{
 background:white;
-padding:18px;
+padding:20px;
 margin-bottom:20px;
 border-radius:10px;
 box-shadow:0 2px 6px rgba(0,0,0,0.1);
@@ -44,11 +44,11 @@ margin:4px;
 }
 
 button:hover{
-background:#1e40af;
+background:#1d4ed8;
 }
 
 input{
-padding:9px;
+padding:8px;
 margin:4px;
 }
 
@@ -68,20 +68,16 @@ background:#1f2937;
 color:white;
 }
 
+#reader{
+width:320px;
+margin-top:10px;
+}
+
 .alert{
 background:#fff3cd;
-border-left:6px solid orange;
 padding:10px;
+border-left:6px solid orange;
 border-radius:6px;
-}
-
-#reader{
-width:300px;
-}
-
-.stat{
-font-size:18px;
-margin:4px;
 }
 
 </style>
@@ -108,65 +104,47 @@ Belum ada barang mendekati expired
 
 <div class="card">
 
-<div class="stat">Total Barang: <span id="total"></span></div>
-
-<div class="stat">Hampir Expired: <span id="expCount"></span></div>
-
-</div>
-
-<div class="card">
-
-<button onclick="show('add')">Tambah Barang</button>
-
-<button onclick="show('stock')">Lihat Stok</button>
-
-</div>
-
-<div class="card" id="add">
-
 <h3>Tambah Barang</h3>
 
 <button onclick="startScanner()">Scan Barcode</button>
 
 <div id="reader"></div>
 
-<input id="barcode" placeholder="Barcode">
+</div>
+
+<div class="card" id="formBarang" style="display:none">
+
+<h3>Data Barang</h3>
+
+<input id="barcode" placeholder="Barcode" readonly>
 
 <input id="nama" placeholder="Nama Barang">
-
-<input id="stok" type="number" placeholder="Jumlah">
 
 <input id="rak" placeholder="Rak">
 
 <input id="baris" placeholder="Baris">
 
+<input id="stok" type="number" placeholder="Jumlah">
+
+<br>
+
 <label>Expired</label>
+
 <input id="exp" type="date">
 
-<label>Tarik dari Display (Hari)</label>
-<input id="warning">
+<label>Hari Tarik Display</label>
 
-<button onclick="addItem()">Simpan</button>
+<input id="warning" placeholder="Contoh: 30">
 
-</div>
+<br>
 
-<div class="card" id="scan" style="display:none">
-
-<h3>Scan Barcode</h3>
-
-<div id="reader"></div>
-
-<p>Barcode: <span id="scanResult"></span></p>
-
-<button onclick="startScanner()">Mulai Scan</button>
+<button onclick="saveItem()">Simpan Barang</button>
 
 </div>
 
-<div class="card" id="stock" style="display:none">
+<div class="card">
 
-<h3>Daftar Stok</h3>
-
-<input id="search" placeholder="Cari barang..." onkeyup="searchItem()">
+<h3>Daftar Barang</h3>
 
 <table>
 
@@ -175,15 +153,15 @@ Belum ada barang mendekati expired
 <tr>
 <th>Barcode</th>
 <th>Nama</th>
-<th>Stok</th>
 <th>Rak</th>
 <th>Baris</th>
+<th>Stok</th>
 <th>Expired</th>
 </tr>
 
 </thead>
 
-<tbody id="stockTable"></tbody>
+<tbody id="table"></tbody>
 
 </table>
 
@@ -193,9 +171,9 @@ Belum ada barang mendekati expired
 
 <script>
 
-let items = JSON.parse(localStorage.getItem("items")) || []
+/* DATABASE */
 
-let warningDays = 30
+let items = JSON.parse(localStorage.getItem("items")) || []
 
 function saveDB(){
 
@@ -203,33 +181,47 @@ localStorage.setItem("items",JSON.stringify(items))
 
 }
 
-function addItem(){
+/* SIMPAN BARANG */
+
+function saveItem(){
 
 let item={
 
 barcode:barcode.value,
 nama:nama.value,
-stok:stok.value,
 rak:rak.value,
 baris:baris.value,
+stok:stok.value,
 exp:exp.value,
 warning:warning.value
 
 }
 
+let exist = items.find(x=>x.barcode==barcode.value)
+
+if(exist){
+
+Object.assign(exist,item)
+
+}else{
+
 items.push(item)
-
-saveDB()
-
-loadData()
-
-alert("Barang tersimpan")
 
 }
 
-function loadData(){
+saveDB()
 
-let table=document.getElementById("stockTable")
+loadItems()
+
+alert("Barang berhasil disimpan")
+
+}
+
+/* LOAD BARANG */
+
+function loadItems(){
+
+let table=document.getElementById("table")
 
 table.innerHTML=""
 
@@ -241,9 +233,9 @@ table.innerHTML+=`
 
 <td>${i.barcode}</td>
 <td>${i.nama}</td>
-<td>${i.stok}</td>
 <td>${i.rak}</td>
 <td>${i.baris}</td>
+<td>${i.stok}</td>
 <td>${i.exp}</td>
 
 </tr>
@@ -252,23 +244,11 @@ table.innerHTML+=`
 
 })
 
-document.getElementById("total").innerText=items.length
-
 checkExpired()
 
 }
 
-function searchItem(){
-
-let key=search.value.toLowerCase()
-
-document.querySelectorAll("#stockTable tr").forEach(r=>{
-
-r.style.display=r.innerText.toLowerCase().includes(key) ? "" : "none"
-
-})
-
-}
+/* CEK EXPIRED */
 
 function checkExpired(){
 
@@ -278,7 +258,7 @@ let panel=document.getElementById("alertList")
 
 panel.innerHTML=""
 
-let count=0
+let found=false
 
 items.forEach(i=>{
 
@@ -288,13 +268,14 @@ let diff=(expDate-today)/(1000*60*60*24)
 
 if(diff<=i.warning){
 
-count++
+found=true
 
 panel.innerHTML+=`
 
 <div>
 
-${i.nama} - Expired ${Math.floor(diff)} hari lagi
+<b>${i.nama}</b> akan expired dalam ${Math.floor(diff)} hari
+
 (Rak ${i.rak} Baris ${i.baris})
 
 </div>
@@ -305,15 +286,47 @@ ${i.nama} - Expired ${Math.floor(diff)} hari lagi
 
 })
 
-if(count==0){
+if(!found){
 
 panel.innerHTML="Tidak ada barang mendekati expired"
 
 }
 
-document.getElementById("expCount").innerText=count
+}
+
+/* LOAD ITEM JIKA SUDAH ADA */
+
+function loadItem(barcodeValue){
+
+let item=items.find(x=>x.barcode==barcodeValue)
+
+if(item){
+
+nama.value=item.nama
+rak.value=item.rak
+baris.value=item.baris
+stok.value=item.stok
+exp.value=item.exp
+warning.value=item.warning
+
+alert("Data barang ditemukan")
+
+}else{
+
+nama.value=""
+rak.value=""
+baris.value=""
+stok.value=""
+exp.value=""
+warning.value="30"
+
+alert("Barang baru, silakan isi data")
 
 }
+
+}
+
+/* SCANNER */
 
 let scanner
 
@@ -326,11 +339,11 @@ scanner.start(
 { fps:10, qrbox:250 },
 (code)=>{
 
-(code)=>{
-
 barcode.value = code
 
 scanner.stop()
+
+document.getElementById("formBarang").style.display="block"
 
 loadItem(code)
 
@@ -339,42 +352,9 @@ loadItem(code)
 
 }
 
-function show(id){
+/* INIT */
 
-["add","scan","stock"].forEach(s=>{
-
-document.getElementById(s).style.display="none"
-
-})
-
-document.getElementById(id).style.display="block"
-
-}
-
-loadData()
-
-
-function loadItem(barcodeValue){
-
-let item = items.find(x=>x.barcode==barcodeValue)
-
-if(item){
-
-nama.value = item.nama
-rak.value = item.rak
-baris.value = item.baris
-exp.value = item.exp
-warning.value = item.warning
-
-alert("Data barang ditemukan")
-
-}else{
-
-alert("Barang baru, silakan isi data")
-
-}
-
-}
+loadItems()
 
 </script>
 

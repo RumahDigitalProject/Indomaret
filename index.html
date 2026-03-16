@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>Retail Inventory Manager</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+
+<style>
+
+/* =========================
+STYLE UTAMA
+========================= */
+
+body{
+font-family:Arial;
+margin:0;
+background:#f3f3f3;
+}
+
+header{
+background:#2c3e50;
+color:white;
+padding:15px;
+font-size:20px;
+}
+
+.container{
+padding:20px;
+}
+
+button{
+padding:10px 15px;
+border:none;
+background:#3498db;
+color:white;
+border-radius:6px;
+cursor:pointer;
+margin:5px;
+}
+
+button:hover{
+background:#2980b9;
+}
+
+input{
+padding:10px;
+margin:5px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+background:white;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:10px;
+text-align:left;
+}
+
+th{
+background:#34495e;
+color:white;
+}
+
+.card{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:8px;
+}
+
+.stat{
+font-size:20px;
+margin:10px 0;
+}
+
+#scanner{
+width:400px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+Retail Inventory Manager
+</header>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+
+<div class="card">
+
+<h2>Dashboard</h2>
+
+<div class="stat">Total Barang : <span id="totalBarang">0</span></div>
+
+<div class="stat">Hampir Expired : <span id="expiredBarang">0</span></div>
+
+</div>
+
+<!-- MENU -->
+
+<div class="card">
+
+<button onclick="showSection('tambah')">Tambah Barang</button>
+
+<button onclick="showSection('scan')">Scan Barcode</button>
+
+<button onclick="showSection('stok')">Lihat Stok</button>
+
+<button onclick="showSection('expired')">Barang Hampir Expired</button>
+
+</div>
+
+<!-- TAMBAH BARANG -->
+
+<div class="card" id="tambahSection">
+
+<h2>Tambah Barang</h2>
+
+<input id="barcode" placeholder="Barcode">
+
+<input id="nama" placeholder="Nama Barang">
+
+<input id="stok" type="number" placeholder="Jumlah Stok">
+
+<input id="rak" placeholder="Rak (A,B,C)">
+
+<input id="baris" placeholder="Baris (1,2,3)">
+
+<br>
+
+<label>Tanggal Expired</label>
+
+<input id="expiredDate" type="date">
+
+<br>
+
+<button onclick="simpanBarang()">Simpan Barang</button>
+
+</div>
+
+<!-- SCAN -->
+
+<div class="card" id="scanSection" style="display:none">
+
+<h2>Scan Barcode</h2>
+
+<div id="scanner"></div>
+
+<p>Barcode : <span id="scanResult"></span></p>
+
+<button onclick="startScanner()">Mulai Scan</button>
+
+</div>
+
+<!-- STOK -->
+
+<div class="card" id="stokSection" style="display:none">
+
+<h2>Daftar Stok</h2>
+
+<input id="search" placeholder="Cari barang..." onkeyup="cariBarang()">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Barcode</th>
+<th>Nama</th>
+<th>Stok</th>
+<th>Rak</th>
+<th>Baris</th>
+<th>Expired</th>
+</tr>
+
+</thead>
+
+<tbody id="tableBarang"></tbody>
+
+</table>
+
+</div>
+
+<!-- EXPIRED -->
+
+<div class="card" id="expiredSection" style="display:none">
+
+<h2>Barang Hampir Expired (H-30)</h2>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Nama</th>
+<th>Rak</th>
+<th>Baris</th>
+<th>Expired</th>
+</tr>
+
+</thead>
+
+<tbody id="expiredTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+DATABASE
+========================= */
+
+let barang = JSON.parse(localStorage.getItem("barang")) || [];
+
+function simpanDB(){
+localStorage.setItem("barang",JSON.stringify(barang));
+}
+
+/* =========================
+TAMBAH BARANG
+========================= */
+
+function simpanBarang(){
+
+let data = {
+
+barcode:document.getElementById("barcode").value,
+nama:document.getElementById("nama").value,
+stok:document.getElementById("stok").value,
+rak:document.getElementById("rak").value,
+baris:document.getElementById("baris").value,
+expired:document.getElementById("expiredDate").value
+
+};
+
+barang.push(data);
+
+simpanDB();
+
+alert("Barang disimpan");
+
+loadBarang();
+
+}
+
+/* =========================
+LOAD STOK
+========================= */
+
+function loadBarang(){
+
+let table=document.getElementById("tableBarang");
+
+if(!table) return;
+
+table.innerHTML="";
+
+barang.forEach(b=>{
+
+let row=`
+
+<tr>
+
+<td>${b.barcode}</td>
+<td>${b.nama}</td>
+<td>${b.stok}</td>
+<td>${b.rak}</td>
+<td>${b.baris}</td>
+<td>${b.expired}</td>
+
+</tr>
+
+`;
+
+table.innerHTML+=row;
+
+});
+
+document.getElementById("totalBarang").innerText=barang.length;
+
+cekExpired();
+
+}
+
+/* =========================
+CEK EXPIRED
+========================= */
+
+function cekExpired(){
+
+let today=new Date();
+
+let list=document.getElementById("expiredTable");
+
+if(!list) return;
+
+list.innerHTML="";
+
+let count=0;
+
+barang.forEach(b=>{
+
+let exp=new Date(b.expired);
+
+let diff=(exp-today)/(1000*60*60*24);
+
+if(diff<=30){
+
+count++;
+
+let row=`
+
+<tr>
+
+<td>${b.nama}</td>
+<td>${b.rak}</td>
+<td>${b.baris}</td>
+<td>${b.expired}</td>
+
+</tr>
+
+`;
+
+list.innerHTML+=row;
+
+}
+
+});
+
+document.getElementById("expiredBarang").innerText=count;
+
+}
+
+/* =========================
+CARI BARANG
+========================= */
+
+function cariBarang(){
+
+let keyword=document.getElementById("search").value.toLowerCase();
+
+let rows=document.querySelectorAll("#tableBarang tr");
+
+rows.forEach(r=>{
+
+let text=r.innerText.toLowerCase();
+
+r.style.display=text.includes(keyword) ? "" : "none";
+
+});
+
+}
+
+/* =========================
+SCAN BARCODE
+========================= */
+
+function startScanner(){
+
+Quagga.init({
+
+inputStream:{
+type:"LiveStream",
+target:document.querySelector('#scanner'),
+constraints:{
+facingMode:"environment"
+}
+},
+
+decoder:{
+readers:["ean_reader","code_128_reader"]
+}
+
+},function(err){
+
+if(!err){
+Quagga.start();
+}
+
+});
+
+Quagga.onDetected(function(data){
+
+let code=data.codeResult.code;
+
+document.getElementById("scanResult").innerText=code;
+
+document.getElementById("barcode").value=code;
+
+Quagga.stop();
+
+});
+
+}
+
+/* =========================
+NAVIGASI
+========================= */
+
+function showSection(name){
+
+document.getElementById("tambahSection").style.display="none";
+document.getElementById("scanSection").style.display="none";
+document.getElementById("stokSection").style.display="none";
+document.getElementById("expiredSection").style.display="none";
+
+document.getElementById(name+"Section").style.display="block";
+
+}
+
+/* =========================
+LOAD AWAL
+========================= */
+
+loadBarang();
+
+</script>
+
+</body>
+</html>

@@ -118,8 +118,6 @@ Belum ada barang mendekati expired
 
 <button onclick="show('add')">Tambah Barang</button>
 
-<button onclick="show('scan')">Scan Barcode</button>
-
 <button onclick="show('stock')">Lihat Stok</button>
 
 </div>
@@ -127,6 +125,10 @@ Belum ada barang mendekati expired
 <div class="card" id="add">
 
 <h3>Tambah Barang</h3>
+
+<button onclick="startScanner()">Scan Barcode</button>
+
+<div id="reader"></div>
 
 <input id="barcode" placeholder="Barcode">
 
@@ -138,13 +140,11 @@ Belum ada barang mendekati expired
 
 <input id="baris" placeholder="Baris">
 
-<br>
-
 <label>Expired</label>
-
 <input id="exp" type="date">
 
-<br>
+<label>Tarik dari Display (Hari)</label>
+<input id="warning">
 
 <button onclick="addItem()">Simpan</button>
 
@@ -212,7 +212,8 @@ nama:nama.value,
 stok:stok.value,
 rak:rak.value,
 baris:baris.value,
-exp:exp.value
+exp:exp.value,
+warning:warning.value
 
 }
 
@@ -285,7 +286,7 @@ let expDate=new Date(i.exp)
 
 let diff=(expDate-today)/(1000*60*60*24)
 
-if(diff<=warningDays){
+if(diff<=i.warning){
 
 count++
 
@@ -325,11 +326,13 @@ scanner.start(
 { fps:10, qrbox:250 },
 (code)=>{
 
-scanResult.innerText=code
+(code)=>{
 
-barcode.value=code
+barcode.value = code
 
 scanner.stop()
+
+loadItem(code)
 
 }
 )
@@ -349,6 +352,29 @@ document.getElementById(id).style.display="block"
 }
 
 loadData()
+
+
+function loadItem(barcodeValue){
+
+let item = items.find(x=>x.barcode==barcodeValue)
+
+if(item){
+
+nama.value = item.nama
+rak.value = item.rak
+baris.value = item.baris
+exp.value = item.exp
+warning.value = item.warning
+
+alert("Data barang ditemukan")
+
+}else{
+
+alert("Barang baru, silakan isi data")
+
+}
+
+}
 
 </script>
 

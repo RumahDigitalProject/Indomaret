@@ -147,9 +147,18 @@ Belum ada barang mendekati expired
 <h3>Daftar Barang</h3>
 <h3>Cari Barang</h3>
 
-<input id="searchInput" placeholder="Cari nama barang..." onkeyup="searchItem()">
+<div style="display:flex;gap:5px;align-items:center">
 
-<button onclick="startSearchScanner()">Scan Cari Barang</button>
+<input id="searchInput"
+placeholder="Cari nama barang..."
+style="flex:1"
+onkeydown="handleEnter(event)">
+
+<button onclick="clearSearch()">❌</button>
+
+<button onclick="startSearchScanner()">Scan</button>
+
+</div>
 
 <div id="readerSearch"></div>
 
@@ -179,6 +188,18 @@ Belum ada barang mendekati expired
 
 <script>
 
+function handleEnter(e){
+if(e.key === "Enter"){
+searchItem()
+}
+}
+
+function clearSearch(){
+
+document.getElementById("searchInput").value = ""
+document.getElementById("searchResult").innerHTML = ""
+
+}
 /* DATABASE */
 
 let items = JSON.parse(localStorage.getItem("items")) || []
@@ -395,16 +416,37 @@ let result = document.getElementById("searchResult")
 
 result.innerHTML = ""
 
+if(key === ""){
+result.innerHTML = "<i>Masukkan nama barang...</i>"
+return
+}
+
+let found = false
+
 items.forEach(i=>{
 
 if(i.nama.toLowerCase().includes(key)){
 
+found = true
+
 result.innerHTML += `
 
-<div onclick="pilihBarang('${i.barcode}')" style="padding:8px;border-bottom:1px solid #ddd;cursor:pointer">
+<div style="
+background:white;
+padding:12px;
+margin-top:8px;
+border-radius:8px;
+box-shadow:0 2px 5px rgba(0,0,0,0.1)
+">
 
-<b>${i.nama}</b><br>
-Rak ${i.rak} - Baris ${i.baris}
+<b style="font-size:16px">${i.nama}</b><br><br>
+
+Barcode : ${i.barcode} <br>
+Rak : ${i.rak} <br>
+Baris : ${i.baris} <br>
+Stok : ${i.stok} <br>
+Expired : ${i.exp} <br>
+Tarik Display : H-${i.warning}
 
 </div>
 
@@ -413,6 +455,10 @@ Rak ${i.rak} - Baris ${i.baris}
 }
 
 })
+
+if(!found){
+result.innerHTML = "<b>Barang tidak ditemukan</b>"
+}
 
 }
 

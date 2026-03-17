@@ -215,6 +215,25 @@ loadItems()
 
 alert("Barang berhasil disimpan")
 
+/* =========================
+RESET SETELAH SIMPAN
+========================= */
+
+// kosongkan semua input
+barcode.value=""
+nama.value=""
+rak.value=""
+baris.value=""
+stok.value=""
+exp.value=""
+warning.value=""
+
+// sembunyikan form
+document.getElementById("formBarang").style.display="none"
+
+// (opsional) kosongkan tampilan scanner
+document.getElementById("reader").innerHTML=""
+
 }
 
 /* LOAD BARANG */

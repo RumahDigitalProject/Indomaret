@@ -7,59 +7,15 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
-body{
-font-family:Segoe UI;
-margin:0;
-background:#eef1f5;
-}
-
-header{
-background:#111827;
-color:white;
-padding:15px;
-font-size:20px;
-}
-
-.container{ padding:20px; }
-
-.card{
-background:white;
-padding:20px;
-margin-bottom:20px;
-border-radius:10px;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
-
-button{
-background:#2563eb;
-color:white;
-border:none;
-padding:10px 15px;
-border-radius:6px;
-cursor:pointer;
-margin:4px;
-}
-
-input, select{
-padding:8px;
-margin:4px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
-}
-
-th,td{
-padding:10px;
-border:1px solid #ddd;
-}
-
-th{
-background:#1f2937;
-color:white;
-}
+body{font-family:Segoe UI;margin:0;background:#eef1f5;}
+header{background:#111827;color:white;padding:15px;font-size:20px;}
+.container{padding:20px;}
+.card{background:white;padding:20px;margin-bottom:20px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+button{background:#2563eb;color:white;border:none;padding:10px 15px;border-radius:6px;cursor:pointer;margin:4px;}
+input,select{padding:8px;margin:4px;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{padding:10px;border:1px solid #ddd;}
+th{background:#1f2937;color:white;}
 </style>
 </head>
 
@@ -72,13 +28,11 @@ color:white;
 <!-- NOTIF -->
 <div class="card">
 <h3>⚠ Notifikasi Expired</h3>
-
 <div id="warningList"></div>
 <div id="expiredList"></div>
-
 </div>
 
-<!-- SCAN -->
+<!-- SCAN TAMBAH -->
 <div class="card">
 <h3>Tambah Barang</h3>
 <button onclick="startScanner()">📷 Scan Barcode</button>
@@ -112,10 +66,8 @@ color:white;
 <!-- FILTER -->
 <div class="card">
 <h3>Filter Barang</h3>
-
 <select id="filterRak" onchange="applyFilter()"></select>
 <select id="filterBaris" onchange="applyFilter()"></select>
-
 </div>
 
 <!-- SEARCH -->
@@ -124,8 +76,9 @@ color:white;
 
 <input id="searchInput" placeholder="Nama barang..." onkeydown="if(event.key==='Enter')searchItem()">
 <button onclick="clearSearch()">❌</button>
-<button onclick="startSearchScanner()">📷</button>
+<button onclick="startSearchScanner()">📷 Scan</button>
 
+<div id="readerSearch"></div>
 <div id="searchResult"></div>
 
 </div>
@@ -178,15 +131,10 @@ color:white;
 let items = JSON.parse(localStorage.getItem("items")) || []
 let laporan = JSON.parse(localStorage.getItem("laporan")) || []
 
-function saveDB(){
-localStorage.setItem("items",JSON.stringify(items))
-}
+function saveDB(){localStorage.setItem("items",JSON.stringify(items))}
+function saveLaporan(){localStorage.setItem("laporan",JSON.stringify(laporan))}
 
-function saveLaporan(){
-localStorage.setItem("laporan",JSON.stringify(laporan))
-}
-
-/* REFRESH GLOBAL */
+/* REFRESH */
 function refreshAll(){
 loadItems()
 loadFilter()
@@ -214,9 +162,9 @@ else items.push(item)
 
 saveDB()
 
-// RESET FORM
-document.getElementById("formBarang").style.display="none"
-document.getElementById("reader").innerHTML=""
+// RESET
+formBarang.style.display="none"
+reader.innerHTML=""
 
 barcode.value=""
 nama.value=""
@@ -227,15 +175,12 @@ exp.value=""
 warning.value=""
 
 alert("✅ Tersimpan")
-
 refreshAll()
 }
 
-/* LOAD TABLE */
+/* LOAD */
 function loadItems(){
-let table=document.getElementById("table")
 table.innerHTML=""
-
 items.forEach(i=>{
 table.innerHTML+=`
 <tr>
@@ -251,30 +196,23 @@ table.innerHTML+=`
 
 /* FILTER */
 function loadFilter(){
-let rakSet=[...new Set(items.map(i=>i.rak))]
-let barisSet=[...new Set(items.map(i=>i.baris))]
-
 filterRak.innerHTML='<option value="">Semua Rak</option>'
 filterBaris.innerHTML='<option value="">Semua Baris</option>'
 
-rakSet.forEach(r=>filterRak.innerHTML+=`<option>${r}</option>`)
-barisSet.forEach(b=>filterBaris.innerHTML+=`<option>${b}</option>`)
+[...new Set(items.map(i=>i.rak))].forEach(r=>filterRak.innerHTML+=`<option>${r}</option>`)
+[...new Set(items.map(i=>i.baris))].forEach(b=>filterBaris.innerHTML+=`<option>${b}</option>`)
 }
 
 function applyFilter(){
-
 let rak=filterRak.value
 let baris=filterBaris.value
 
-let filtered = items.filter(i=>
-(!rak || i.rak==rak) &&
-(!baris || i.baris==baris)
+let data=items.filter(i=>
+(!rak||i.rak==rak)&&(!baris||i.baris==baris)
 )
 
-let table=document.getElementById("table")
 table.innerHTML=""
-
-filtered.forEach(i=>{
+data.forEach(i=>{
 table.innerHTML+=`
 <tr>
 <td>${i.barcode}</td>
@@ -291,22 +229,26 @@ table.innerHTML+=`
 function searchItem(){
 
 let key=searchInput.value.toLowerCase()
-let result=document.getElementById("searchResult")
-
-result.innerHTML=""
+searchResult.innerHTML=""
 
 items.forEach(i=>{
 if(i.nama.toLowerCase().includes(key)){
-result.innerHTML+=`
+searchResult.innerHTML+=`
 <div class="card">
 <b>${i.nama}</b><br>
+Barcode: ${i.barcode}<br>
 Rak ${i.rak} | Baris ${i.baris}<br>
 Stok ${i.stok}<br>
 Exp ${i.exp}
+
+<br><br>
+
+<button onclick="editItem('${i.barcode}')">✏️ Edit</button>
+<button onclick="deleteItem('${i.barcode}')">🗑 Hapus</button>
+
 </div>`
 }
 })
-
 }
 
 function clearSearch(){
@@ -314,20 +256,99 @@ searchInput.value=""
 searchResult.innerHTML=""
 }
 
-/* LAPORAN */
-function loadLaporan(){
-let table=laporanTable
-table.innerHTML=""
+/* EDIT */
+function editItem(code){
+let item=items.find(x=>x.barcode==code)
 
-laporan.forEach(l=>{
-table.innerHTML+=`
-<tr>
-<td>${l.nama}</td>
-<td>${l.status}</td>
-<td>${l.stok}</td>
-<td>${l.tanggal}</td>
-</tr>`
-})
+formBarang.style.display="block"
+
+barcode.value=item.barcode
+nama.value=item.nama
+rak.value=item.rak
+baris.value=item.baris
+stok.value=item.stok
+exp.value=item.exp
+warning.value=item.warning
+
+window.scrollTo({top:0,behavior:"smooth"})
+}
+
+/* DELETE */
+function deleteItem(code){
+if(confirm("Yakin hapus?")){
+items=items.filter(x=>x.barcode!=code)
+saveDB()
+refreshAll()
+searchItem()
+}
+}
+
+/* SCAN TAMBAH */
+function startScanner(){
+
+let scanner=new Html5Qrcode("reader")
+
+scanner.start(
+{facingMode:"environment"},
+{fps:10,qrbox:250},
+(code)=>{
+
+barcode.value=code
+scanner.stop()
+
+formBarang.style.display="block"
+
+let item=items.find(x=>x.barcode==code)
+
+if(item){
+nama.value=item.nama
+rak.value=item.rak
+baris.value=item.baris
+stok.value=item.stok
+exp.value=item.exp
+warning.value=item.warning
+}
+
+}
+)
+}
+
+/* SCAN SEARCH */
+function startSearchScanner(){
+
+let scanner=new Html5Qrcode("readerSearch")
+
+scanner.start(
+{facingMode:"environment"},
+{fps:10,qrbox:250},
+(code)=>{
+
+scanner.stop()
+
+let item=items.find(x=>x.barcode==code)
+
+if(item){
+
+searchResult.innerHTML=`
+<div class="card">
+<b>${item.nama}</b><br>
+Rak ${item.rak} | Baris ${item.baris}<br>
+Stok ${item.stok}<br>
+Exp ${item.exp}
+
+<br><br>
+
+<button onclick="editItem('${item.barcode}')">✏️ Edit</button>
+<button onclick="deleteItem('${item.barcode}')">🗑 Hapus</button>
+
+</div>`
+
+}else{
+alert("Barang tidak ditemukan")
+}
+
+}
+)
 }
 
 /* EXPIRED */
@@ -343,26 +364,24 @@ items.forEach(i=>{
 let diff=Math.ceil((new Date(i.exp)-today)/86400000)
 
 if(diff<=0){
-
 expiredList.innerHTML+=`
 <div class="card">
-🔴 ${i.nama}<br>
-<button onclick="updateExp('${i.barcode}')">✔ Update</button>
+🔴 ${i.nama}
+<button onclick="updateExp('${i.barcode}')">✔</button>
 </div>`
-
-}else if(diff<=i.warning){
-
+}
+else if(diff<=i.warning){
 warningList.innerHTML+=`
 <div class="card">
 ⚠ ${i.nama} (H-${diff})
-<button onclick="updateExp('${i.barcode}')">✔ Update</button>
+<button onclick="updateExp('${i.barcode}')">✔</button>
 </div>`
 }
 
 })
 }
 
-/* UPDATE EXP */
+/* UPDATE */
 function updateExp(code){
 
 let item=items.find(x=>x.barcode==code)
@@ -370,7 +389,7 @@ let item=items.find(x=>x.barcode==code)
 let newExp=prompt("Exp baru (YYYY-MM-DD)")
 let newStok=prompt("Stok baru")
 
-let status=confirm("OK = Terjual | Cancel = Expired")
+let status=confirm("OK=Terjual | Cancel=Expired")
 
 laporan.push({
 nama:item.nama,
@@ -384,38 +403,21 @@ item.stok=newStok
 
 saveDB()
 saveLaporan()
-
 refreshAll()
 }
 
-/* SCANNER */
-function startScanner(){
-
-let scanner=new Html5Qrcode("reader")
-
-scanner.start(
-{ facingMode:"environment" },
-{ fps:10, qrbox:250 },
-(code)=>{
-
-barcode.value=code
-scanner.stop()
-
-document.getElementById("formBarang").style.display="block"
-
-let item=items.find(x=>x.barcode==code)
-
-if(item){
-nama.value=item.nama
-rak.value=item.rak
-baris.value=item.baris
-stok.value=item.stok
-exp.value=item.exp
-warning.value=item.warning
-}
-
-}
-)
+/* LAPORAN */
+function loadLaporan(){
+laporanTable.innerHTML=""
+laporan.forEach(l=>{
+laporanTable.innerHTML+=`
+<tr>
+<td>${l.nama}</td>
+<td>${l.status}</td>
+<td>${l.stok}</td>
+<td>${l.tanggal}</td>
+</tr>`
+})
 }
 
 /* INIT */

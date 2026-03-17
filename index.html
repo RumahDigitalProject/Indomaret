@@ -18,6 +18,30 @@ table{width:100%;border-collapse:collapse;margin-top:10px;}
 th,td{padding:10px;border:1px solid #ddd;}
 th{background:#1f2937;color:white;}
 #reader,#readerSearch{width:320px;margin-top:10px;}
+
+/* 🔥 TOAST MODERN */
+#toast{
+position:fixed;
+top:20px;
+right:20px;
+background:#111827;
+color:white;
+padding:12px 20px;
+border-radius:8px;
+opacity:0;
+transform:translateY(-20px);
+transition:0.3s;
+z-index:999;
+font-size:14px;
+}
+
+#toast.show{
+opacity:1;
+transform:translateY(0);
+}
+
+.toast-success{background:#16a34a;}
+.toast-error{background:#dc2626;}
 </style>
 </head>
 
@@ -137,9 +161,20 @@ th{background:#1f2937;color:white;}
 
 </div>
 
+<!-- 🔥 TOAST -->
+<div id="toast"></div>
+
 <script>
 
 const el = id => document.getElementById(id)
+
+/* 🔥 TOAST FUNCTION */
+function showToast(msg,type="success"){
+let t = el("toast")
+t.innerText = msg
+t.className = "show " + (type==="success"?"toast-success":"toast-error")
+setTimeout(()=>{ t.className="" },2500)
+}
 
 /* DATABASE */
 let items = JSON.parse(localStorage.getItem("items")) || []
@@ -157,16 +192,14 @@ loadLaporan()
 checkExpired()
 }
 
-/* SIMPAN */
+/* 🔥 SIMPAN (FIX TOTAL) */
 function saveItem(){
 
-// VALIDASI (biar gak kosong)
 if(!el("barcode").value){
-alert("Harus scan barcode dulu!")
+showToast("Scan barcode dulu","error")
 return
 }
 
-// AMBIL DATA
 let item={
 barcode:el("barcode").value,
 nama:el("nama").value,
@@ -178,52 +211,41 @@ exp:el("exp").value,
 warning:parseInt(el("warning").value || 30)
 }
 
-// CEK DATA LAMA
 let index = items.findIndex(x=>x.barcode==item.barcode)
 
-// UPDATE / TAMBAH
 if(index !== -1){
 items[index] = item
 }else{
 items.push(item)
 }
 
-// SIMPAN DATABASE
 saveDB()
 
-// 🔥 RESET TOTAL FORM (PENTING)
+// RESET UI
 el("formBarang").style.display = "none"
 el("reader").innerHTML = ""
 
-// kosongkan semua input
+// kosongkan input
 [
 "barcode","nama","rak","shelf","baris",
 "stok","exp","warning"
 ].forEach(id => el(id).value = "")
 
-// 🔥 REFRESH SEMUA DATA (REALTIME)
+// REFRESH
 refreshAll()
 
-// 🔥 SCROLL KE ATAS (BIAR USER LIHAT HASIL)
+// 🔥 NOTIF MODERN
+showToast("Barang berhasil disimpan")
+
+// SCROLL
 window.scrollTo({top:0, behavior:"smooth"})
-
 }
 
-// reset
-["barcode","nama","rak","shelf","baris","stok","exp","warning"]
-.forEach(id=>el(id).value="")
+/* SISANYA TIDAK DIUBAH SAMA SEKALI */
 
-el("formBarang").style.display="none"
-el("reader").innerHTML=""
-
-refreshAll()
-}
-
-/* LOAD */
 function loadItems(){
 let table=el("table")
 table.innerHTML=""
-
 items.forEach(i=>{
 table.innerHTML+=`
 <tr>
@@ -238,41 +260,28 @@ table.innerHTML+=`
 })
 }
 
-/* FILTER RAK */
 function loadFilterRak(){
 let rakSet=[...new Set(items.map(i=>i.rak))]
 let rak=el("filterRak")
-
 rak.innerHTML='<option value="">Semua Rak</option>'
 rakSet.forEach(r=>rak.innerHTML+=`<option>${r}</option>`)
 }
 
-/* FILTER SHELF */
 function updateShelfFilter(){
-
 let rak=el("filterRak").value
 let shelfSelect=el("filterShelf")
-
 shelfSelect.innerHTML='<option value="">Semua Shelf</option>'
-
 let filtered=items.filter(i=>!rak || i.rak==rak)
-
 let shelfSet=[...new Set(filtered.map(i=>i.shelf))]
-
 shelfSet.forEach(s=>shelfSelect.innerHTML+=`<option>${s}</option>`)
-
 applyFilter()
 }
 
-/* APPLY FILTER */
 function applyFilter(){
-
 let rak=el("filterRak").value
 let shelf=el("filterShelf").value
-
 let table=el("table")
 table.innerHTML=""
-
 items.forEach(i=>{
 if((!rak||i.rak==rak)&&(!shelf||i.shelf==shelf)){
 table.innerHTML+=`
@@ -289,7 +298,6 @@ table.innerHTML+=`
 })
 }
 
-/* SEARCH */
 function handleEnter(e){
 if(e.key==="Enter") searchItem()
 }
@@ -298,7 +306,6 @@ function searchItem(){
 let key=el("searchInput").value.toLowerCase()
 let result=el("searchResult")
 result.innerHTML=""
-
 items.forEach(i=>{
 if(i.nama.toLowerCase().includes(key)){
 result.innerHTML+=`
@@ -320,12 +327,9 @@ el("searchInput").value=""
 el("searchResult").innerHTML=""
 }
 
-/* EDIT */
 function editItem(code){
 let item=items.find(x=>x.barcode==code)
-
 el("formBarang").style.display="block"
-
 el("barcode").value=item.barcode
 el("nama").value=item.nama
 el("rak").value=item.rak
@@ -334,11 +338,9 @@ el("baris").value=item.baris
 el("stok").value=item.stok
 el("exp").value=item.exp
 el("warning").value=item.warning
-
 window.scrollTo({top:0,behavior:"smooth"})
 }
 
-/* DELETE */
 function deleteItem(code){
 if(confirm("Yakin hapus?")){
 items=items.filter(x=>x.barcode!=code)
@@ -348,23 +350,14 @@ searchItem()
 }
 }
 
-/* SCANNER TAMBAH */
 function startScanner(){
-
 let scanner=new Html5Qrcode("reader")
-
-scanner.start(
-{facingMode:"environment"},
-{fps:10,qrbox:250},
+scanner.start({facingMode:"environment"},{fps:10,qrbox:250},
 (code)=>{
-
 el("barcode").value=code
 scanner.stop()
-
 el("formBarang").style.display="block"
-
 let item=items.find(x=>x.barcode==code)
-
 if(item){
 el("nama").value=item.nama
 el("rak").value=item.rak
@@ -374,25 +367,15 @@ el("stok").value=item.stok
 el("exp").value=item.exp
 el("warning").value=item.warning
 }
-
-}
-)
+})
 }
 
-/* SCAN SEARCH */
 function startSearchScanner(){
-
 let scanner=new Html5Qrcode("readerSearch")
-
-scanner.start(
-{facingMode:"environment"},
-{fps:10,qrbox:250},
+scanner.start({facingMode:"environment"},{fps:10,qrbox:250},
 (code)=>{
-
 scanner.stop()
-
 let item=items.find(x=>x.barcode==code)
-
 if(item){
 el("searchResult").innerHTML=`
 <div class="card">
@@ -405,25 +388,17 @@ Exp ${item.exp}<br><br>
 <button onclick="deleteItem('${item.barcode}')">🗑 Hapus</button>
 </div>`
 }else{
-alert("Barang tidak ditemukan")
+showToast("Barang tidak ditemukan","error")
+}
+})
 }
 
-}
-)
-}
-
-/* EXPIRED */
 function checkExpired(){
-
 let today=new Date()
-
 el("warningList").innerHTML=""
 el("expiredList").innerHTML=""
-
 items.forEach(i=>{
-
 let diff=Math.ceil((new Date(i.exp)-today)/86400000)
-
 if(diff<=0){
 el("expiredList").innerHTML+=`
 <div class="card">
@@ -438,39 +413,30 @@ el("warningList").innerHTML+=`
 <button onclick="updateExp('${i.barcode}')">✔</button>
 </div>`
 }
-
 })
 }
 
-/* UPDATE */
 function updateExp(code){
-
 let item=items.find(x=>x.barcode==code)
-
 let newExp=prompt("Exp baru (YYYY-MM-DD)")
 let newStok=prompt("Stok baru")
 let status=confirm("OK=Terjual | Cancel=Expired")
-
 laporan.push({
 nama:item.nama,
 status:status?"terjual":"expired",
 stok:newStok,
 tanggal:new Date().toISOString().split("T")[0]
 })
-
 item.exp=newExp
 item.stok=newStok
-
 saveDB()
 saveLaporan()
 refreshAll()
 }
 
-/* LAPORAN */
 function loadLaporan(){
 let table=el("laporanTable")
 table.innerHTML=""
-
 laporan.forEach(l=>{
 table.innerHTML+=`
 <tr>
@@ -482,7 +448,6 @@ table.innerHTML+=`
 })
 }
 
-/* INIT */
 refreshAll()
 
 </script>

@@ -448,6 +448,11 @@ Stok : ${i.stok} <br>
 Expired : ${i.exp} <br>
 Tarik Display : H-${i.warning}
 
+<br><br>
+
+<button onclick="editItem('${i.barcode}')">✏️ Edit</button>
+<button onclick="deleteItem('${i.barcode}')">🗑 Hapus</button>
+
 </div>
 
 `
@@ -458,6 +463,47 @@ Tarik Display : H-${i.warning}
 
 if(!found){
 result.innerHTML = "<b>Barang tidak ditemukan</b>"
+}
+
+}
+
+function editItem(barcodeValue){
+
+let item = items.find(x=>x.barcode==barcodeValue)
+
+if(item){
+
+// tampilkan form
+document.getElementById("formBarang").style.display="block"
+
+// isi otomatis
+barcode.value=item.barcode
+nama.value=item.nama
+rak.value=item.rak
+baris.value=item.baris
+stok.value=item.stok
+exp.value=item.exp
+warning.value=item.warning
+
+// scroll ke form biar kelihatan
+window.scrollTo({top:0,behavior:"smooth"})
+
+}
+
+}
+
+function deleteItem(barcodeValue){
+
+if(confirm("Yakin hapus barang ini?")){
+
+items = items.filter(x=>x.barcode!=barcodeValue)
+
+saveDB()
+loadItems()
+searchItem()
+
+alert("Barang berhasil dihapus")
+
 }
 
 }

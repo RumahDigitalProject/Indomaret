@@ -160,23 +160,54 @@ checkExpired()
 /* SIMPAN */
 function saveItem(){
 
+// VALIDASI (biar gak kosong)
+if(!el("barcode").value){
+alert("Harus scan barcode dulu!")
+return
+}
+
+// AMBIL DATA
 let item={
 barcode:el("barcode").value,
 nama:el("nama").value,
 rak:el("rak").value,
 shelf:el("shelf").value,
 baris:el("baris").value,
-stok:el("stok").value,
+stok:parseInt(el("stok").value || 0),
 exp:el("exp").value,
 warning:parseInt(el("warning").value || 30)
 }
 
-let exist = items.find(x=>x.barcode==item.barcode)
+// CEK DATA LAMA
+let index = items.findIndex(x=>x.barcode==item.barcode)
 
-if(exist) Object.assign(exist,item)
-else items.push(item)
+// UPDATE / TAMBAH
+if(index !== -1){
+items[index] = item
+}else{
+items.push(item)
+}
 
+// SIMPAN DATABASE
 saveDB()
+
+// 🔥 RESET TOTAL FORM (PENTING)
+el("formBarang").style.display = "none"
+el("reader").innerHTML = ""
+
+// kosongkan semua input
+[
+"barcode","nama","rak","shelf","baris",
+"stok","exp","warning"
+].forEach(id => el(id).value = "")
+
+// 🔥 REFRESH SEMUA DATA (REALTIME)
+refreshAll()
+
+// 🔥 SCROLL KE ATAS (BIAR USER LIHAT HASIL)
+window.scrollTo({top:0, behavior:"smooth"})
+
+}
 
 // reset
 ["barcode","nama","rak","shelf","baris","stok","exp","warning"]

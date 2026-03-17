@@ -145,7 +145,15 @@ Belum ada barang mendekati expired
 <div class="card">
 
 <h3>Daftar Barang</h3>
+<h3>Cari Barang</h3>
 
+<input id="searchInput" placeholder="Cari nama barang..." onkeyup="searchItem()">
+
+<button onclick="startSearchScanner()">Scan Cari Barang</button>
+
+<div id="readerSearch"></div>
+
+<div id="searchResult"></div>
 <table>
 
 <thead>
@@ -375,6 +383,93 @@ loadItem(code)
 
 loadItems()
 
+/* =========================
+SEARCH BY NAMA
+========================= */
+
+function searchItem(){
+
+let key = document.getElementById("searchInput").value.toLowerCase()
+
+let result = document.getElementById("searchResult")
+
+result.innerHTML = ""
+
+items.forEach(i=>{
+
+if(i.nama.toLowerCase().includes(key)){
+
+result.innerHTML += `
+
+<div onclick="pilihBarang('${i.barcode}')" style="padding:8px;border-bottom:1px solid #ddd;cursor:pointer">
+
+<b>${i.nama}</b><br>
+Rak ${i.rak} - Baris ${i.baris}
+
+</div>
+
+`
+
+}
+
+})
+
+}
+
+function pilihBarang(barcodeValue){
+
+let item = items.find(x=>x.barcode==barcodeValue)
+
+if(item){
+
+alert(
+"Nama: " + item.nama + "\n" +
+"Rak: " + item.rak + "\n" +
+"Baris: " + item.baris + "\n" +
+"Stok: " + item.stok + "\n" +
+"Expired: " + item.exp
+)
+
+}
+
+}
+
+let searchScanner
+
+function startSearchScanner(){
+
+searchScanner = new Html5Qrcode("readerSearch")
+
+searchScanner.start(
+{ facingMode: "environment" },
+{ fps:10, qrbox:250 },
+(code)=>{
+
+searchScanner.stop()
+
+let item = items.find(x=>x.barcode==code)
+
+if(item){
+
+alert(
+"Nama: " + item.nama + "\n" +
+"Rak: " + item.rak + "\n" +
+"Baris: " + item.baris + "\n" +
+"Stok: " + item.stok + "\n" +
+"Expired: " + item.exp
+)
+
+}else{
+
+alert("Barang tidak ditemukan")
+
+}
+
+}
+)
+
+}
+  
 </script>
 
 </body>

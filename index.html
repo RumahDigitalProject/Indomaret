@@ -381,10 +381,14 @@ let found=false
 items.forEach(i=>{
 
 let expDate=new Date(i.exp)
-let diff=(expDate-today)/(1000*60*60*24)
-
-if(diff<=i.warning){
-
+let diff = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24))
+if(diff > 0 && diff <= i.warning){
+if(diff <= 0){
+  // barang sudah expired (merah)
+}
+else if(diff <= i.warning){
+  // hampir expired (kuning)
+}
 found=true
 
 panel.innerHTML+=`

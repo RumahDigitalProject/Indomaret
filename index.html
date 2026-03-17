@@ -19,7 +19,7 @@ th,td{padding:10px;border:1px solid #ddd;}
 th{background:#1f2937;color:white;}
 #reader,#readerSearch{width:320px;margin-top:10px;}
 
-/* 🔥 TOAST MODERN */
+/* TOAST */
 #toast{
 position:fixed;
 top:20px;
@@ -32,14 +32,8 @@ opacity:0;
 transform:translateY(-20px);
 transition:0.3s;
 z-index:999;
-font-size:14px;
 }
-
-#toast.show{
-opacity:1;
-transform:translateY(0);
-}
-
+#toast.show{opacity:1;transform:translateY(0);}
 .toast-success{background:#16a34a;}
 .toast-error{background:#dc2626;}
 </style>
@@ -62,8 +56,9 @@ transform:translateY(0);
 <div id="expiredList"></div>
 </div>
 
-<!-- SCAN -->
+<!-- SCAN + LAPORAN HEADER -->
 <div class="card">
+
 <div style="display:flex;justify-content:space-between;align-items:center">
 
 <div>
@@ -77,6 +72,7 @@ transform:translateY(0);
 </div>
 
 </div>
+
 <div id="reader"></div>
 </div>
 
@@ -152,8 +148,27 @@ transform:translateY(0);
 </table>
 </div>
 
-<!-- 🔥 TOAST -->
-<div id="toast"></div>
+<!-- LAPORAN LAMA (TETAP ADA, TIDAK DIHAPUS) -->
+<div class="card">
+<h3>Laporan Barang (Default)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Nama</th>
+<th>Status</th>
+<th>Stok</th>
+<th>Tanggal</th>
+</tr>
+</thead>
+
+<tbody id="laporanTableDefault"></tbody>
+</table>
+</div>
+
+</div>
+
+<!-- HALAMAN LAPORAN KHUSUS -->
 <div id="laporanPage" style="display:none;padding:20px">
 
 <button onclick="closeLaporan()" style="background:#dc2626">❌ Tutup</button>
@@ -175,8 +190,21 @@ transform:translateY(0);
 
 </div>
 
+<div id="toast"></div>
+
 <script>
 
+const el = id => document.getElementById(id)
+
+/* TOAST */
+function showToast(msg,type="success"){
+let t = el("toast")
+t.innerText = msg
+t.className = "show " + (type==="success"?"toast-success":"toast-error")
+setTimeout(()=>{ t.className="" },2500)
+}
+
+/* NAVIGASI LAPORAN */
 function openLaporan(){
 el("mainPage").style.display="none"
 el("laporanPage").style.display="block"
@@ -187,16 +215,6 @@ el("laporanPage").style.display="none"
 el("mainPage").style.display="block"
 }
 
-const el = id => document.getElementById(id)
-
-/* 🔥 TOAST FUNCTION */
-function showToast(msg,type="success"){
-let t = el("toast")
-t.innerText = msg
-t.className = "show " + (type==="success"?"toast-success":"toast-error")
-setTimeout(()=>{ t.className="" },2500)
-}
-
 /* DATABASE */
 let items = JSON.parse(localStorage.getItem("items")) || []
 let laporan = JSON.parse(localStorage.getItem("laporan")) || []
@@ -204,7 +222,6 @@ let laporan = JSON.parse(localStorage.getItem("laporan")) || []
 function saveDB(){ localStorage.setItem("items", JSON.stringify(items)) }
 function saveLaporan(){ localStorage.setItem("laporan", JSON.stringify(laporan)) }
 
-/* REFRESH */
 function refreshAll(){
 loadItems()
 loadFilterRak()
@@ -213,7 +230,7 @@ loadLaporan()
 checkExpired()
 }
 
-/* 🔥 SIMPAN (FIX TOTAL) */
+/* SIMPAN */
 function saveItem(){
 
 if(!el("barcode").value){
@@ -242,28 +259,20 @@ items.push(item)
 
 saveDB()
 
-// RESET UI
 el("formBarang").style.display = "none"
 el("reader").innerHTML = ""
 
-// kosongkan input
-[
-"barcode","nama","rak","shelf","baris",
-"stok","exp","warning"
-].forEach(id => el(id).value = "")
+["barcode","nama","rak","shelf","baris","stok","exp","warning"]
+.forEach(id => el(id).value = "")
 
-// REFRESH
 refreshAll()
 
-// 🔥 NOTIF MODERN
 showToast("Barang berhasil disimpan")
 
-// SCROLL
 window.scrollTo({top:0, behavior:"smooth"})
 }
 
-/* SISANYA TIDAK DIUBAH SAMA SEKALI */
-
+/* LOAD */
 function loadItems(){
 let table=el("table")
 table.innerHTML=""
@@ -281,6 +290,28 @@ table.innerHTML+=`
 })
 }
 
+/* LAPORAN */
+function loadLaporan(){
+let t1=el("laporanTable")
+let t2=el("laporanTableDefault")
+
+t1.innerHTML=""
+t2.innerHTML=""
+
+laporan.forEach(l=>{
+let row=`
+<tr>
+<td>${l.nama}</td>
+<td>${l.status}</td>
+<td>${l.stok}</td>
+<td>${l.tanggal}</td>
+</tr>`
+t1.innerHTML+=row
+t2.innerHTML+=row
+})
+}
+
+/* SISANYA TETAP */
 function loadFilterRak(){
 let rakSet=[...new Set(items.map(i=>i.rak))]
 let rak=el("filterRak")
@@ -421,51 +452,11 @@ el("expiredList").innerHTML=""
 items.forEach(i=>{
 let diff=Math.ceil((new Date(i.exp)-today)/86400000)
 if(diff<=0){
-el("expiredList").innerHTML+=`
-<div class="card">
-🔴 ${i.nama}
-<button onclick="updateExp('${i.barcode}')">✔</button>
-</div>`
+el("expiredList").innerHTML+=`<div class="card">🔴 ${i.nama}</div>`
 }
 else if(diff<=i.warning){
-el("warningList").innerHTML+=`
-<div class="card">
-⚠ ${i.nama} (H-${diff})
-<button onclick="updateExp('${i.barcode}')">✔</button>
-</div>`
+el("warningList").innerHTML+=`<div class="card">⚠ ${i.nama} (H-${diff})</div>`
 }
-})
-}
-
-function updateExp(code){
-let item=items.find(x=>x.barcode==code)
-let newExp=prompt("Exp baru (YYYY-MM-DD)")
-let newStok=prompt("Stok baru")
-let status=confirm("OK=Terjual | Cancel=Expired")
-laporan.push({
-nama:item.nama,
-status:status?"terjual":"expired",
-stok:newStok,
-tanggal:new Date().toISOString().split("T")[0]
-})
-item.exp=newExp
-item.stok=newStok
-saveDB()
-saveLaporan()
-refreshAll()
-}
-
-function loadLaporan(){
-let table=el("laporanTable")
-table.innerHTML=""
-laporan.forEach(l=>{
-table.innerHTML+=`
-<tr>
-<td>${l.nama}</td>
-<td>${l.status}</td>
-<td>${l.stok}</td>
-<td>${l.tanggal}</td>
-</tr>`
 })
 }
 

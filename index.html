@@ -372,7 +372,6 @@ loadFilterOptions()
 function checkExpired(){
 
 let today=new Date()
-
 let panel=document.getElementById("alertList")
 
 panel.innerHTML=""
@@ -382,7 +381,6 @@ let found=false
 items.forEach(i=>{
 
 let expDate=new Date(i.exp)
-
 let diff=(expDate-today)/(1000*60*60*24)
 
 if(diff<=i.warning){
@@ -391,11 +389,22 @@ found=true
 
 panel.innerHTML+=`
 
-<div>
+<div style="
+background:#fff3cd;
+padding:10px;
+margin-top:8px;
+border-radius:8px;
+border-left:5px solid orange;
+">
 
-<b>${i.nama}</b> akan expired dalam ${Math.floor(diff)} hari
+<b>${i.nama}</b> (H-${Math.floor(diff)})<br>
+Rak ${i.rak} Baris ${i.baris}
 
-(Rak ${i.rak} Baris ${i.baris})
+<br><br>
+
+<button onclick="markChecked('${i.barcode}')">✔ Cek</button>
+<button onclick="editItem('${i.barcode}')">✏️ Edit</button>
+<button onclick="deleteItem('${i.barcode}')">🗑 Hapus</button>
 
 </div>
 
@@ -406,13 +415,32 @@ panel.innerHTML+=`
 })
 
 if(!found){
-
 panel.innerHTML="Tidak ada barang mendekati expired"
-
 }
 
 }
 
+/* Tindakan exp */
+function markChecked(barcodeValue){
+
+let item = items.find(x=>x.barcode==barcodeValue)
+
+if(item){
+
+// trik: geser tanggal expired 1 hari biar keluar dari notif
+let newDate = new Date(item.exp)
+newDate.setDate(newDate.getDate() + 1)
+
+item.exp = newDate.toISOString().split("T")[0]
+
+saveDB()
+loadItems()
+
+alert("Barang sudah ditandai (tidak muncul di notifikasi)")
+
+}
+
+}
 /* LOAD ITEM JIKA SUDAH ADA */
 
 function loadItem(barcodeValue){

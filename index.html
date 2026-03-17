@@ -96,7 +96,11 @@ Retail Inventory Dashboard
 
 <b>Barang Mendekati Expired</b>
 
-<div id="alertList">
+<h3>⚠ Hampir Expired</h3>
+<div id="warningList"></div>
+
+<h3 style="margin-top:15px">🔴 Sudah Expired</h3>
+<div id="expiredList"></div>
 Belum ada barang mendekati expired
 </div>
 
@@ -368,30 +372,58 @@ loadFilterOptions()
 }
 
 /* CEK EXPIRED */
-
 function checkExpired(){
 
-let today=new Date()
-let panel=document.getElementById("alertList")
+let today = new Date()
 
-panel.innerHTML=""
+let warningPanel = document.getElementById("warningList")
+let expiredPanel = document.getElementById("expiredList")
 
-let found=false
+warningPanel.innerHTML = ""
+expiredPanel.innerHTML = ""
+
+let adaWarning = false
+let adaExpired = false
 
 items.forEach(i=>{
 
-let expDate=new Date(i.exp)
+let expDate = new Date(i.exp)
 let diff = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24))
-if(diff > 0 && diff <= i.warning){
-if(diff <= 0){
-  // barang sudah expired (merah)
-}
-else if(diff <= i.warning){
-  // hampir expired (kuning)
-}
-found=true
 
-panel.innerHTML+=`
+// 🔴 SUDAH EXPIRED
+if(diff <= 0){
+
+adaExpired = true
+
+expiredPanel.innerHTML += `
+
+<div style="
+background:#fee2e2;
+padding:10px;
+margin-top:8px;
+border-radius:8px;
+border-left:5px solid red;
+">
+
+<b>${i.nama}</b> (EXPIRED)<br>
+Rak ${i.rak} Baris ${i.baris}
+
+<br><br>
+
+<button onclick="openUpdateExp('${i.barcode}')">✔ Update Exp</button>
+
+</div>
+
+`
+
+}
+
+// ⚠ HAMPIR EXPIRED
+else if(diff <= i.warning){
+
+adaWarning = true
+
+warningPanel.innerHTML += `
 
 <div style="
 background:#fff3cd;
@@ -401,7 +433,7 @@ border-radius:8px;
 border-left:5px solid orange;
 ">
 
-<b>${i.nama}</b> (H-${Math.floor(diff)})<br>
+<b>${i.nama}</b> (H-${diff})<br>
 Rak ${i.rak} Baris ${i.baris}
 
 <br><br>
@@ -416,8 +448,12 @@ Rak ${i.rak} Baris ${i.baris}
 
 })
 
-if(!found){
-panel.innerHTML="Tidak ada barang mendekati expired"
+if(!adaWarning){
+warningPanel.innerHTML = "<i>Tidak ada barang hampir expired</i>"
+}
+
+if(!adaExpired){
+expiredPanel.innerHTML = "<i>Tidak ada barang expired</i>"
 }
 
 }

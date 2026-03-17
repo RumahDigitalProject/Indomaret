@@ -191,7 +191,23 @@ z-index:999;
 </div>
 
 <div id="toast"></div>
+<!-- TAMBAHKAN DI BAWAH <div id="toast"></div> (TIDAK MENGGANGGU APAPUN) -->
+<div id="formTindakan" class="card" style="display:none; position:fixed; bottom:20px; right:20px; width:300px; z-index:999;">
+<h3>Tindakan Barang</h3>
 
+<input id="t_nama" readonly placeholder="Nama Barang">
+<input id="t_stok" type="number" placeholder="Sisa Stok">
+
+<br>
+
+<label><input type="checkbox" id="t_exp"> Barang Expired</label><br>
+<label><input type="checkbox" id="t_terjual"> Barang Terjual</label>
+
+<br><br>
+
+<button onclick="simpanTindakan()">Simpan</button>
+<button onclick="tutupTindakan()" style="background:#6b7280">Batal</button>
+</div>
 <script>
 
 const el = id => document.getElementById(id)
@@ -452,14 +468,87 @@ el("expiredList").innerHTML=""
 items.forEach(i=>{
 let diff=Math.ceil((new Date(i.exp)-today)/86400000)
 if(diff<=0){
-el("expiredList").innerHTML+=`<div class="card">🔴 ${i.nama}</div>`
+el("expiredList").innerHTML+=`
+<div class="card">
+🔴 ${i.nama}
+<br><br>
+<button onclick="updateExp('${i.barcode}')">✔ Tindakan</button>
+</div>`
 }
 else if(diff<=i.warning){
-el("warningList").innerHTML+=`<div class="card">⚠ ${i.nama} (H-${diff})</div>`
+el("warningList").innerHTML+=`
+<div class="card">
+⚠ ${i.nama} (H-${diff})
+<br><br>
+<button onclick="updateExp('${i.barcode}')">✔ Tindakan</button>
+</div>`
 }
 })
 }
 
+/* ===================== */
+/* TAMBAHAN FITUR TINDAKAN */
+/* ===================== */
+
+let selectedBarcode = null
+
+function updateExp(barcode){
+let item = items.find(x=>x.barcode==barcode)
+
+selectedBarcode = barcode
+
+el("formTindakan").style.display = "block"
+el("t_nama").value = item.nama
+el("t_stok").value = item.stok
+
+el("t_exp").checked = false
+el("t_terjual").checked = false
+}
+
+function tutupTindakan(){
+el("formTindakan").style.display = "none"
+selectedBarcode = null
+}
+
+function simpanTindakan(){
+
+if(!selectedBarcode) return
+
+let item = items.find(x=>x.barcode==selectedBarcode)
+
+let stokBaru = parseInt(el("t_stok").value || 0)
+let isExp = el("t_exp").checked
+let isTerjual = el("t_terjual").checked
+
+let status = ""
+
+if(isExp) status = "Expired"
+if(isTerjual) status = "Terjual"
+
+if(!status){
+showToast("Pilih status dulu","error")
+return
+}
+
+/* update stok */
+item.stok = stokBaru
+saveDB()
+
+/* simpan laporan */
+laporan.push({
+nama: item.nama,
+status: status,
+stok: stokBaru,
+tanggal: new Date().toLocaleDateString()
+})
+
+saveLaporan()
+
+tutupTindakan()
+refreshAll()
+
+showToast("Tindakan berhasil disimpan")
+}
 refreshAll()
 
 </script>

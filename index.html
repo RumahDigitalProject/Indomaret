@@ -194,13 +194,55 @@ onkeydown="handleEnter(event)">
 <tbody id="table"></tbody>
 
 </table>
+<div class="card">
+
+<h3>Laporan Barang</h3>
+
+<table>
+
+<thead>
+<tr>
+<th>Nama</th>
+<th>Status</th>
+<th>Stok</th>
+<th>Tanggal</th>
+</tr>
+</thead>
+
+<tbody id="laporanTable"></tbody>
+
+</table>
+
+</div>
 
 </div>
 
 </div>
 
 <script>
+function loadLaporan(){
 
+let table = document.getElementById("laporanTable")
+
+table.innerHTML = ""
+
+laporan.forEach(l=>{
+
+table.innerHTML += `
+
+<tr>
+<td>${l.nama}</td>
+<td>${l.status}</td>
+<td>${l.stok}</td>
+<td>${l.tanggal}</td>
+</tr>
+
+`
+
+})
+
+}
+  
 function handleEnter(e){
 if(e.key === "Enter"){
 searchItem()
@@ -315,6 +357,7 @@ items.push(item)
 saveDB()
 
 loadItems()
+loadLaporan()
 
 alert("Barang berhasil disimpan")
 
@@ -370,7 +413,12 @@ checkExpired()
 loadFilterOptions()
 
 }
+/* Laporan exp */
+let laporan = JSON.parse(localStorage.getItem("laporan")) || []
 
+function saveLaporan(){
+localStorage.setItem("laporan", JSON.stringify(laporan))
+}
 /* CEK EXPIRED */
 function checkExpired(){
 
@@ -496,9 +544,12 @@ document.getElementById("popupExp").style.display="none"
 
 }
 
+/* Exp */
 function saveNewExp(){
 
 let newExp = document.getElementById("newExp").value
+let newStok = document.getElementById("newStok").value
+let status = document.querySelector('input[name="statusBarang"]:checked').value
 
 if(newExp==""){
 alert("Isi tanggal dulu!")
@@ -509,12 +560,27 @@ let item = items.find(x=>x.barcode==currentBarcode)
 
 if(item){
 
+// simpan ke laporan
+laporan.push({
+nama: item.nama,
+barcode: item.barcode,
+rak: item.rak,
+baris: item.baris,
+status: status,
+stok: newStok,
+tanggal: new Date().toISOString().split("T")[0]
+})
+
+saveLaporan()
+
+// update data utama
 item.exp = newExp
+item.stok = newStok
 
 saveDB()
 loadItems()
 
-alert("Expired berhasil diperbarui")
+alert("Data berhasil diperbarui")
 
 closePopup()
 
@@ -740,7 +806,7 @@ alert("Barang tidak ditemukan")
 )
 
 }
-  
+
 </script>
 
 </body>
@@ -760,12 +826,25 @@ align-items:center;
 background:white;
 padding:20px;
 border-radius:10px;
-width:300px;
+width:320px;
 ">
 
-<h3>Update Expired</h3>
+<h3>Update Barang</h3>
 
+<label>Tanggal Exp Baru</label>
 <input type="date" id="newExp">
+
+<br><br>
+
+<label>Stok Sekarang</label>
+<input type="number" id="newStok">
+
+<br><br>
+
+<label>Status Barang</label><br>
+
+<input type="radio" name="statusBarang" value="expired" checked> Barang Expired<br>
+<input type="radio" name="statusBarang" value="terjual"> Barang Terjual
 
 <br><br>
 

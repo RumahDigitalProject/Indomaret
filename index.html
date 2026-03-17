@@ -25,21 +25,18 @@ th{background:#1f2937;color:white;}
 
 <div class="container">
 
-<!-- NOTIF -->
 <div class="card">
 <h3>⚠ Notifikasi Expired</h3>
 <div id="warningList"></div>
 <div id="expiredList"></div>
 </div>
 
-<!-- SCAN TAMBAH -->
 <div class="card">
 <h3>Tambah Barang</h3>
 <button onclick="startScanner()">📷 Scan Barcode</button>
 <div id="reader"></div>
 </div>
 
-<!-- FORM -->
 <div class="card" id="formBarang" style="display:none">
 <h3>Data Barang</h3>
 
@@ -63,18 +60,16 @@ th{background:#1f2937;color:white;}
 
 </div>
 
-<!-- FILTER -->
 <div class="card">
 <h3>Filter Barang</h3>
 <select id="filterRak" onchange="applyFilter()"></select>
 <select id="filterBaris" onchange="applyFilter()"></select>
 </div>
 
-<!-- SEARCH -->
 <div class="card">
 <h3>Cari Barang</h3>
 
-<input id="searchInput" placeholder="Nama barang..." onkeydown="if(event.key==='Enter')searchItem()">
+<input id="searchInput" placeholder="Nama barang..." onkeydown="handleEnter(event)">
 <button onclick="clearSearch()">❌</button>
 <button onclick="startSearchScanner()">📷 Scan</button>
 
@@ -83,7 +78,6 @@ th{background:#1f2937;color:white;}
 
 </div>
 
-<!-- TABLE -->
 <div class="card">
 <h3>Daftar Barang</h3>
 
@@ -104,7 +98,6 @@ th{background:#1f2937;color:white;}
 
 </div>
 
-<!-- LAPORAN -->
 <div class="card">
 <h3>Laporan</h3>
 
@@ -127,12 +120,15 @@ th{background:#1f2937;color:white;}
 
 <script>
 
+/* ELEMENT */
+const el = id => document.getElementById(id)
+
 /* DATABASE */
 let items = JSON.parse(localStorage.getItem("items")) || []
 let laporan = JSON.parse(localStorage.getItem("laporan")) || []
 
-function saveDB(){localStorage.setItem("items",JSON.stringify(items))}
-function saveLaporan(){localStorage.setItem("laporan",JSON.stringify(laporan))}
+function saveDB(){ localStorage.setItem("items", JSON.stringify(items)) }
+function saveLaporan(){ localStorage.setItem("laporan", JSON.stringify(laporan)) }
 
 /* REFRESH */
 function refreshAll(){
@@ -145,44 +141,40 @@ checkExpired()
 /* SIMPAN */
 function saveItem(){
 
-let item={
-barcode:barcode.value,
-nama:nama.value,
-rak:rak.value,
-baris:baris.value,
-stok:stok.value,
-exp:exp.value,
-warning:parseInt(warning.value)
+let item = {
+barcode: el("barcode").value,
+nama: el("nama").value,
+rak: el("rak").value,
+baris: el("baris").value,
+stok: el("stok").value,
+exp: el("exp").value,
+warning: parseInt(el("warning").value || 30)
 }
 
-let exist = items.find(x=>x.barcode==item.barcode)
+let exist = items.find(x => x.barcode == item.barcode)
 
-if(exist) Object.assign(exist,item)
+if(exist) Object.assign(exist, item)
 else items.push(item)
 
 saveDB()
 
 // RESET
-formBarang.style.display="none"
-reader.innerHTML=""
+el("formBarang").style.display="none"
+el("reader").innerHTML=""
 
-barcode.value=""
-nama.value=""
-rak.value=""
-baris.value=""
-stok.value=""
-exp.value=""
-warning.value=""
+["barcode","nama","rak","baris","stok","exp","warning"].forEach(id=>el(id).value="")
 
 alert("✅ Tersimpan")
 refreshAll()
 }
 
-/* LOAD */
+/* LOAD TABLE */
 function loadItems(){
+let table = el("table")
 table.innerHTML=""
+
 items.forEach(i=>{
-table.innerHTML+=`
+table.innerHTML += `
 <tr>
 <td>${i.barcode}</td>
 <td>${i.nama}</td>
@@ -196,22 +188,31 @@ table.innerHTML+=`
 
 /* FILTER */
 function loadFilter(){
-filterRak.innerHTML='<option value="">Semua Rak</option>'
-filterBaris.innerHTML='<option value="">Semua Baris</option>'
+let rakSet = [...new Set(items.map(i=>i.rak))]
+let barisSet = [...new Set(items.map(i=>i.baris))]
 
-[...new Set(items.map(i=>i.rak))].forEach(r=>filterRak.innerHTML+=`<option>${r}</option>`)
-[...new Set(items.map(i=>i.baris))].forEach(b=>filterBaris.innerHTML+=`<option>${b}</option>`)
+let rak = el("filterRak")
+let baris = el("filterBaris")
+
+rak.innerHTML='<option value="">Semua Rak</option>'
+baris.innerHTML='<option value="">Semua Baris</option>'
+
+rakSet.forEach(r=>rak.innerHTML+=`<option>${r}</option>`)
+barisSet.forEach(b=>baris.innerHTML+=`<option>${b}</option>`)
 }
 
 function applyFilter(){
-let rak=filterRak.value
-let baris=filterBaris.value
+let rak = el("filterRak").value
+let baris = el("filterBaris").value
 
-let data=items.filter(i=>
-(!rak||i.rak==rak)&&(!baris||i.baris==baris)
+let data = items.filter(i=>
+(!rak || i.rak==rak) &&
+(!baris || i.baris==baris)
 )
 
+let table = el("table")
 table.innerHTML=""
+
 data.forEach(i=>{
 table.innerHTML+=`
 <tr>
@@ -226,49 +227,50 @@ table.innerHTML+=`
 }
 
 /* SEARCH */
-function searchItem(){
+function handleEnter(e){
+if(e.key==="Enter") searchItem()
+}
 
-let key=searchInput.value.toLowerCase()
-searchResult.innerHTML=""
+function searchItem(){
+let key = el("searchInput").value.toLowerCase()
+let result = el("searchResult")
+result.innerHTML=""
 
 items.forEach(i=>{
 if(i.nama.toLowerCase().includes(key)){
-searchResult.innerHTML+=`
+result.innerHTML+=`
 <div class="card">
 <b>${i.nama}</b><br>
 Barcode: ${i.barcode}<br>
 Rak ${i.rak} | Baris ${i.baris}<br>
 Stok ${i.stok}<br>
-Exp ${i.exp}
-
-<br><br>
+Exp ${i.exp}<br><br>
 
 <button onclick="editItem('${i.barcode}')">✏️ Edit</button>
 <button onclick="deleteItem('${i.barcode}')">🗑 Hapus</button>
-
 </div>`
 }
 })
 }
 
 function clearSearch(){
-searchInput.value=""
-searchResult.innerHTML=""
+el("searchInput").value=""
+el("searchResult").innerHTML=""
 }
 
 /* EDIT */
 function editItem(code){
-let item=items.find(x=>x.barcode==code)
+let item = items.find(x=>x.barcode==code)
 
-formBarang.style.display="block"
+el("formBarang").style.display="block"
 
-barcode.value=item.barcode
-nama.value=item.nama
-rak.value=item.rak
-baris.value=item.baris
-stok.value=item.stok
-exp.value=item.exp
-warning.value=item.warning
+el("barcode").value=item.barcode
+el("nama").value=item.nama
+el("rak").value=item.rak
+el("baris").value=item.baris
+el("stok").value=item.stok
+el("exp").value=item.exp
+el("warning").value=item.warning
 
 window.scrollTo({top:0,behavior:"smooth"})
 }
@@ -276,37 +278,40 @@ window.scrollTo({top:0,behavior:"smooth"})
 /* DELETE */
 function deleteItem(code){
 if(confirm("Yakin hapus?")){
-items=items.filter(x=>x.barcode!=code)
+items = items.filter(x=>x.barcode!=code)
 saveDB()
 refreshAll()
 searchItem()
 }
 }
 
-/* SCAN TAMBAH */
+/* SCANNER TAMBAH */
+let scanTambah = null
+
 function startScanner(){
 
-let scanner=new Html5Qrcode("reader")
+scanTambah = new Html5Qrcode("reader")
 
-scanner.start(
+scanTambah.start(
 {facingMode:"environment"},
 {fps:10,qrbox:250},
 (code)=>{
 
-barcode.value=code
-scanner.stop()
+el("barcode").value = code
 
-formBarang.style.display="block"
+scanTambah.stop()
 
-let item=items.find(x=>x.barcode==code)
+el("formBarang").style.display="block"
+
+let item = items.find(x=>x.barcode==code)
 
 if(item){
-nama.value=item.nama
-rak.value=item.rak
-baris.value=item.baris
-stok.value=item.stok
-exp.value=item.exp
-warning.value=item.warning
+el("nama").value=item.nama
+el("rak").value=item.rak
+el("baris").value=item.baris
+el("stok").value=item.stok
+el("exp").value=item.exp
+el("warning").value=item.warning
 }
 
 }
@@ -314,33 +319,32 @@ warning.value=item.warning
 }
 
 /* SCAN SEARCH */
+let scanCari = null
+
 function startSearchScanner(){
 
-let scanner=new Html5Qrcode("readerSearch")
+scanCari = new Html5Qrcode("readerSearch")
 
-scanner.start(
+scanCari.start(
 {facingMode:"environment"},
 {fps:10,qrbox:250},
 (code)=>{
 
-scanner.stop()
+scanCari.stop()
 
-let item=items.find(x=>x.barcode==code)
+let item = items.find(x=>x.barcode==code)
 
 if(item){
 
-searchResult.innerHTML=`
+el("searchResult").innerHTML=`
 <div class="card">
 <b>${item.nama}</b><br>
 Rak ${item.rak} | Baris ${item.baris}<br>
 Stok ${item.stok}<br>
-Exp ${item.exp}
-
-<br><br>
+Exp ${item.exp}<br><br>
 
 <button onclick="editItem('${item.barcode}')">✏️ Edit</button>
 <button onclick="deleteItem('${item.barcode}')">🗑 Hapus</button>
-
 </div>`
 
 }else{
@@ -354,24 +358,24 @@ alert("Barang tidak ditemukan")
 /* EXPIRED */
 function checkExpired(){
 
-let today=new Date()
+let today = new Date()
 
-warningList.innerHTML=""
-expiredList.innerHTML=""
+el("warningList").innerHTML=""
+el("expiredList").innerHTML=""
 
 items.forEach(i=>{
 
-let diff=Math.ceil((new Date(i.exp)-today)/86400000)
+let diff = Math.ceil((new Date(i.exp)-today)/86400000)
 
 if(diff<=0){
-expiredList.innerHTML+=`
+el("expiredList").innerHTML+=`
 <div class="card">
 🔴 ${i.nama}
 <button onclick="updateExp('${i.barcode}')">✔</button>
 </div>`
 }
 else if(diff<=i.warning){
-warningList.innerHTML+=`
+el("warningList").innerHTML+=`
 <div class="card">
 ⚠ ${i.nama} (H-${diff})
 <button onclick="updateExp('${i.barcode}')">✔</button>
@@ -384,12 +388,11 @@ warningList.innerHTML+=`
 /* UPDATE */
 function updateExp(code){
 
-let item=items.find(x=>x.barcode==code)
+let item = items.find(x=>x.barcode==code)
 
-let newExp=prompt("Exp baru (YYYY-MM-DD)")
-let newStok=prompt("Stok baru")
-
-let status=confirm("OK=Terjual | Cancel=Expired")
+let newExp = prompt("Exp baru (YYYY-MM-DD)")
+let newStok = prompt("Stok baru")
+let status = confirm("OK=Terjual | Cancel=Expired")
 
 laporan.push({
 nama:item.nama,
@@ -408,9 +411,11 @@ refreshAll()
 
 /* LAPORAN */
 function loadLaporan(){
-laporanTable.innerHTML=""
+let table = el("laporanTable")
+table.innerHTML=""
+
 laporan.forEach(l=>{
-laporanTable.innerHTML+=`
+table.innerHTML+=`
 <tr>
 <td>${l.nama}</td>
 <td>${l.status}</td>

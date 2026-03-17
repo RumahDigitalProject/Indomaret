@@ -197,8 +197,13 @@ z-index:999;
 
 <input id="t_nama" readonly placeholder="Nama Barang">
 <input id="t_stok" type="number" placeholder="Sisa Stok">
-
 <br>
+
+<label>Exp Baru</label>
+<input id="t_exp" type="date">
+
+<label>H- Notif</label>
+<input id="t_warning" type="number" placeholder="Contoh: 30">
 
 <label><input type="checkbox" id="t_exp"> Barang Expired</label><br>
 <label><input type="checkbox" id="t_terjual"> Barang Terjual</label>
@@ -503,6 +508,8 @@ el("t_stok").value = item.stok
 
 el("t_exp").checked = false
 el("t_terjual").checked = false
+el("t_exp").value = item.exp
+el("t_warning").value = item.warning
 }
 
 function tutupTindakan(){
@@ -517,6 +524,8 @@ if(!selectedBarcode) return
 let item = items.find(x=>x.barcode==selectedBarcode)
 
 let stokBaru = parseInt(el("t_stok").value || 0)
+let expBaru = el("t_exp").value
+let warningBaru = parseInt(el("t_warning").value || item.warning)
 let isExp = el("t_exp").checked
 let isTerjual = el("t_terjual").checked
 
@@ -532,6 +541,9 @@ return
 
 /* update stok */
 item.stok = stokBaru
+
+if(expBaru) item.exp = expBaru
+if(warningBaru) item.warning = warningBaru
 saveDB()
 
 /* simpan laporan */

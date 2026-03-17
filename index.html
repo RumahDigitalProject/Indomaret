@@ -145,6 +145,15 @@ Belum ada barang mendekati expired
 <div class="card">
 
 <h3>Daftar Barang</h3>
+<h3>Filter Barang</h3>
+
+<select id="filterRak" onchange="applyFilter()">
+<option value="">Semua Rak</option>
+</select>
+
+<select id="filterBaris" onchange="applyFilter()">
+<option value="">Semua Baris</option>
+</select>
 <h3>Cari Barang</h3>
 
 <div style="display:flex;gap:5px;align-items:center">
@@ -198,6 +207,67 @@ function clearSearch(){
 
 document.getElementById("searchInput").value = ""
 document.getElementById("searchResult").innerHTML = ""
+
+}
+/* FILTER BARANG */
+function loadFilterOptions(){
+
+let rakSet = new Set()
+let barisSet = new Set()
+
+items.forEach(i=>{
+rakSet.add(i.rak)
+barisSet.add(i.baris)
+})
+
+let rakSelect = document.getElementById("filterRak")
+let barisSelect = document.getElementById("filterBaris")
+
+rakSelect.innerHTML = '<option value="">Semua Rak</option>'
+barisSelect.innerHTML = '<option value="">Semua Baris</option>'
+
+rakSet.forEach(r=>{
+rakSelect.innerHTML += `<option value="${r}">${r}</option>`
+})
+
+barisSet.forEach(b=>{
+barisSelect.innerHTML += `<option value="${b}">${b}</option>`
+})
+
+}
+
+function applyFilter(){
+
+let rak = document.getElementById("filterRak").value
+let baris = document.getElementById("filterBaris").value
+
+let table = document.getElementById("table")
+
+table.innerHTML=""
+
+items.forEach(i=>{
+
+if(
+(rak=="" || i.rak==rak) &&
+(baris=="" || i.baris==baris)
+){
+
+table.innerHTML += `
+
+<tr>
+<td>${i.barcode}</td>
+<td>${i.nama}</td>
+<td>${i.rak}</td>
+<td>${i.baris}</td>
+<td>${i.stok}</td>
+<td>${i.exp}</td>
+</tr>
+
+`
+
+}
+
+})
 
 }
 /* DATABASE */
@@ -293,6 +363,7 @@ table.innerHTML+=`
 })
 
 checkExpired()
+loadFilterOptions()
 
 }
 

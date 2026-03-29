@@ -14,14 +14,13 @@
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* BANNER SYNC (TIDAK MENGGANGGU KLIK) */
+        /* BANNER SYNC */
         #syncBanner {
             position: fixed; top: 0; left: 0; width: 100%; background: #2563eb; color: white;
             font-size: 11px; font-weight: 600; text-align: center; padding: 4px;
             z-index: 9999; transform: translateY(-100%); transition: transform 0.3s ease-in-out;
             display: flex; justify-content: center; align-items: center; gap: 8px;
-            pointer-events: none; /* KUNCI: Biar banner ini tembus kalau diklik (nggak menutupi header) */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         #syncBanner.show { transform: translateY(0); }
         .mini-spinner {
@@ -106,13 +105,13 @@
         .c-row { display: flex; justify-content: space-between; }
         .highlight { color: #60a5fa; font-weight: 600; }
 
-        /* MODAL */
+        /* MODAL FULL EDIT */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(5px); align-items: center; justify-content: center;
         }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: #1e293b; width: 90%; max-width: 350px; padding: 20px; border-radius: 16px; border: 1px solid #3b82f6; }
+        .modal-content { background: #1e293b; width: 95%; max-width: 380px; padding: 20px; border-radius: 16px; border: 1px solid #3b82f6; max-height: 90vh; overflow-y: auto; }
         .btn-close-modal { background: transparent; color: #94a3b8; border: 1px solid #475569; width: 100%; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight:600; cursor: pointer;}
 
         /* TOAST */
@@ -194,13 +193,43 @@
 
     <div id="modalTindakan" class="modal-overlay">
         <div class="modal-content">
-            <h2>🔄 Tindakan Barang</h2>
-            <p id="modalNamaBarang" style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-bottom: 15px;"></p>
-            <input type="hidden" id="editId">
-            <div class="form-group"><label>Ganti Tanggal Expired Baru</label><input type="date" id="editExpDate"></div>
-            <div class="form-group"><label>Masa Tarik Baru (H- Hari)</label><input type="number" id="editTarikDays"></div>
+            <h2 style="margin-bottom: 20px;">✏️ Edit Data Barang</h2>
             
-            <button class="btn-primary" onclick="simpanTindakan()">Simpan Pembaruan</button>
+            <input type="hidden" id="editId">
+            
+            <div class="form-group">
+                <label>Nama Produk</label>
+                <input type="text" id="editNama">
+            </div>
+            
+            <div class="form-group">
+                <label>Jenis Modis</label>
+                <input type="text" id="editModis" list="modisHistory">
+            </div>
+            
+            <div class="input-row">
+                <div class="form-group">
+                    <label>Shelving</label>
+                    <input type="number" id="editShelf">
+                </div>
+                <div class="form-group">
+                    <label>Baris</label>
+                    <input type="number" id="editBaris">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label>Tanggal Expired</label>
+                    <input type="date" id="editExpDate">
+                </div>
+                <div class="form-group">
+                    <label>Masa Tarik H-</label>
+                    <input type="number" id="editTarikDays">
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="simpanTindakan()">💾 Simpan Pembaruan</button>
             <button class="btn-danger" onclick="hapusBarangDariSistem()">🗑️ Hapus Permanen Barang Ini</button>
             <button class="btn-close-modal" onclick="tutupModal()">Batal</button>
         </div>
@@ -211,16 +240,13 @@
     <script>
         const URL_GOOGLE_SHEET = 'https://script.google.com/macros/s/AKfycbwA3uvzmYyjttATknVVWk8dzkCu3se9byGBkZ6h93ZaJhYquPG_8zHyNI6rpkLDYc-v/exec';
         
-        // Ambil data sementara dari memori HP biar loading aplikasi instan 0 detik
         let dbBarang = JSON.parse(localStorage.getItem('returHubCache')) || [];
 
-        // Langsung jalankan aplikasi pakai memori lokal, lalu tarik data asli dari Sheet diam-diam
         window.onload = () => {
             initApp(); 
             tarikDataGoogleSheet();
         };
 
-        // FUNGSI SYNC BANNER (BACKGROUND LOADING)
         let syncTimeout;
         function setSyncStatus(isSyncing, text = "Menyinkronkan...") {
             const banner = document.getElementById('syncBanner');
@@ -230,10 +256,7 @@
             if (isSyncing) {
                 banner.classList.add('show');
             } else {
-                // Tahan banner sebentar biar kelihatan kalau sukses, lalu hilangkan
-                syncTimeout = setTimeout(() => {
-                    banner.classList.remove('show');
-                }, 1500);
+                syncTimeout = setTimeout(() => { banner.classList.remove('show'); }, 1500);
             }
         }
 
@@ -242,11 +265,7 @@
             try {
                 const response = await fetch(URL_GOOGLE_SHEET);
                 dbBarang = await response.json();
-                
-                // Simpan ke memori HP
                 localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
-                
-                // Perbarui tampilan web tanpa mengganggu pengguna
                 initApp(); 
                 terapkanFilter(); 
                 setSyncStatus(false, "Sinkronisasi selesai! ✅");
@@ -259,20 +278,12 @@
         async function pushDataKeGoogleSheet() {
             setSyncStatus(true, "Menyimpan perubahan ke awan...");
             try {
-                // Simpan ke memori HP dulu biar cepat
                 localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
-
-                // Lempar datanya ke Google Sheet
-                await fetch(URL_GOOGLE_SHEET, {
-                    method: 'POST',
-                    body: JSON.stringify(dbBarang)
-                });
-                
+                await fetch(URL_GOOGLE_SHEET, { method: 'POST', body: JSON.stringify(dbBarang) });
                 setSyncStatus(false, "Tersimpan aman! ✅");
             } catch (error) {
                 console.error(error);
                 setSyncStatus(false, "Gagal upload. Menunggu koneksi... ⚠");
-                showToast("Koneksi bermasalah. Data tersimpan di HP sementara.");
             }
         }
 
@@ -312,7 +323,7 @@
             return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
         }
 
-        // --- MANAJEMEN DATA (SEKARANG UI INSTAN!) ---
+        // --- MANAJEMEN DATA ---
         function simpanBarang() {
             const nama = document.getElementById('nama').value;
             const modis = document.getElementById('modis').value;
@@ -325,42 +336,60 @@
                 alert("Isi semua data lokasinya ya!"); return;
             }
 
-            // 1. Ubah data lokal langsung
             dbBarang.push({
                 id: Date.now().toString(),
                 nama, modis, shelf: parseInt(shelf), baris: parseInt(baris), 
                 expDate, tarikDays: parseInt(tarikDays)
             });
 
-            // 2. Kosongkan form dan kasih toast seketika (UX Instan)
             ['nama','modis','shelf','baris','expDate','tarikDays'].forEach(id => document.getElementById(id).value = '');
             showToast("Data ditambahkan!");
             initApp();
-            
-            // 3. Sinkronisasi berjalan diam-diam di background
             pushDataKeGoogleSheet();
         }
 
+        // --- BUKA MODAL DENGAN FULL DATA ---
+        function bukaModalTindakan(id) {
+            const item = dbBarang.find(x => x.id === id);
+            
+            document.getElementById('editId').value = item.id;
+            document.getElementById('editNama').value = item.nama;
+            document.getElementById('editModis').value = item.modis;
+            document.getElementById('editShelf').value = item.shelf;
+            document.getElementById('editBaris').value = item.baris;
+            document.getElementById('editExpDate').value = item.expDate;
+            document.getElementById('editTarikDays').value = item.tarikDays;
+            
+            document.getElementById('modalTindakan').classList.add('active');
+        }
+
+        function tutupModal() { document.getElementById('modalTindakan').classList.remove('active'); }
+
+        // --- SIMPAN TINDAKAN (FULL DATA UPDATE) ---
         function simpanTindakan() {
             const id = document.getElementById('editId').value;
+            const newNama = document.getElementById('editNama').value;
+            const newModis = document.getElementById('editModis').value;
+            const newShelf = document.getElementById('editShelf').value;
+            const newBaris = document.getElementById('editBaris').value;
             const newExp = document.getElementById('editExpDate').value;
             const newTarik = document.getElementById('editTarikDays').value;
 
-            if(!newExp || !newTarik) return alert("Isi formnya dulu!");
+            if(!newNama || !newModis || !newExp || !newTarik) return alert("Jangan ada data yang dikosongkan!");
 
             let index = dbBarang.findIndex(x => x.id === id);
             if(index !== -1) {
-                // 1. Ubah data instan
+                dbBarang[index].nama = newNama;
+                dbBarang[index].modis = newModis;
+                dbBarang[index].shelf = parseInt(newShelf);
+                dbBarang[index].baris = parseInt(newBaris);
                 dbBarang[index].expDate = newExp;
                 dbBarang[index].tarikDays = parseInt(newTarik);
                 
-                // 2. Tutup modal & perbarui UI instan
                 tutupModal();
                 initApp();
                 terapkanFilter();
                 showToast("Pembaruan berhasil!");
-
-                // 3. Upload background
                 pushDataKeGoogleSheet();
             }
         }
@@ -484,23 +513,12 @@
                         <div class="c-body">
                             <span>📍 ${item.modis} | S: ${item.shelf} | B: ${item.baris}</span>
                             <span>⏳ Exp: ${formatTanggal(item.expDate)}</span>
-                            <button class="btn-action" style="margin-top:6px; background:#475569" onclick="bukaModalTindakan('${item.id}')">🔄 Tindakan</button>
+                            <button class="btn-action" style="margin-top:6px; background:#475569" onclick="bukaModalTindakan('${item.id}')">✏️ Edit / Selesaikan</button>
                         </div>
                     </div>
                 `;
             });
         }
-
-        function bukaModalTindakan(id) {
-            const item = dbBarang.find(x => x.id === id);
-            document.getElementById('editId').value = item.id;
-            document.getElementById('modalNamaBarang').innerText = `${item.nama} (${item.modis} S:${item.shelf} B:${item.baris})`;
-            document.getElementById('editExpDate').value = item.expDate;
-            document.getElementById('editTarikDays').value = item.tarikDays;
-            document.getElementById('modalTindakan').classList.add('active');
-        }
-
-        function tutupModal() { document.getElementById('modalTindakan').classList.remove('active'); }
     </script>
 </body>
 </html>

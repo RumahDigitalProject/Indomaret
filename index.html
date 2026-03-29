@@ -14,9 +14,24 @@
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+        /* BANNER SYNC (TIDAK MENGGANGGU KLIK) */
+        #syncBanner {
+            position: fixed; top: 0; left: 0; width: 100%; background: #2563eb; color: white;
+            font-size: 11px; font-weight: 600; text-align: center; padding: 4px;
+            z-index: 9999; transform: translateY(-100%); transition: transform 0.3s ease-in-out;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            pointer-events: none; /* KUNCI: Biar banner ini tembus kalau diklik (nggak menutupi header) */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        #syncBanner.show { transform: translateY(0); }
+        .mini-spinner {
+            width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;
+        }
+
         /* HEADER */
         header {
-            background: linear-gradient(135deg, #1e3a8a, #2563eb); padding: 15px; text-align: center;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb); padding: 20px 15px 15px 15px; text-align: center;
             position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
         }
@@ -54,8 +69,7 @@
         /* BUTTONS */
         .btn-primary {
             width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;
-            border: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 5px;
-            cursor: pointer;
+            border: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 5px; cursor: pointer;
         }
         .btn-action {
             background: #3b82f6; border: none; color: white; padding: 6px 10px;
@@ -66,11 +80,9 @@
             border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 10px; cursor: pointer;
         }
 
-        /* FILTER BOX */
+        /* FILTER BOX & SEARCH BAR */
         .filter-container { display: flex; gap: 8px; margin-bottom: 10px; }
         .filter-container select { flex: 1; padding: 8px; font-size: 12px; }
-
-        /* SEARCH BAR */
         .search-box { position: relative; margin-bottom: 15px; }
         .search-box input { padding-left: 35px; border-color: #3b82f6; }
         .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 16px; }
@@ -103,28 +115,19 @@
         .modal-content { background: #1e293b; width: 90%; max-width: 350px; padding: 20px; border-radius: 16px; border: 1px solid #3b82f6; }
         .btn-close-modal { background: transparent; color: #94a3b8; border: 1px solid #475569; width: 100%; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight:600; cursor: pointer;}
 
-        /* TOAST & LOADING */
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #10b981; color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: 600; transition: 0.3s; z-index: 1000; }
+        /* TOAST */
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #10b981; color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: 600; transition: 0.3s; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         #toast.show { transform: translateX(-50%) translateY(0); }
         .empty-state { text-align: center; padding: 20px; color: #64748b; font-size: 13px; }
         
-        #loadingScreen {
-            display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.9); z-index: 9999; align-items: center; justify-content: center;
-            flex-direction: column; color: #3b82f6; font-weight: 600; font-size: 14px;
-        }
-        .spinner {
-            border: 4px solid rgba(59, 130, 246, 0.3); border-top: 4px solid #3b82f6;
-            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px;
-        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="loadingScreen">
-        <div class="spinner"></div>
-        <div id="loadingText">Menghubungkan ke Google Sheet...</div>
+    <div id="syncBanner">
+        <div class="mini-spinner"></div>
+        <span id="syncText">Menyinkronkan...</span>
     </div>
 
     <header>
@@ -160,7 +163,7 @@
                     <div class="form-group"><label>Tgl Expired</label><input type="date" id="expDate"></div>
                     <div class="form-group"><label>Tarik H- (Hari)</label><input type="number" id="tarikDays" placeholder="Contoh: 60"></div>
                 </div>
-                <button class="btn-primary" onclick="simpanBarang()">Simpan & Upload Data</button>
+                <button class="btn-primary" onclick="simpanBarang()">Simpan Data</button>
             </div>
         </div>
 
@@ -168,7 +171,7 @@
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <h2>🔍 Letak Barang</h2>
-                    <button class="btn-action" style="background:#059669; padding:8px 12px; margin-top:0;" onclick="tarikDataGoogleSheet()">🔄 Refresh Data</button>
+                    <button class="btn-action" style="background:#059669; padding:8px 12px; margin-top:0;" onclick="tarikDataGoogleSheet()">🔄 Refresh Web</button>
                 </div>
                 <div class="search-box">
                     <span class="search-icon">🔎</span>
@@ -206,48 +209,71 @@
     <div id="toast">Notifikasi</div>
 
     <script>
-        // URL GOOGLE SHEET MILIKMU SUDAH TERPASANG DI SINI:
         const URL_GOOGLE_SHEET = 'https://script.google.com/macros/s/AKfycbwA3uvzmYyjttATknVVWk8dzkCu3se9byGBkZ6h93ZaJhYquPG_8zHyNI6rpkLDYc-v/exec';
         
-        let dbBarang = [];
+        // Ambil data sementara dari memori HP biar loading aplikasi instan 0 detik
+        let dbBarang = JSON.parse(localStorage.getItem('returHubCache')) || [];
 
-        // Tarik data saat aplikasi pertama kali dibuka
-        window.onload = () => tarikDataGoogleSheet();
+        // Langsung jalankan aplikasi pakai memori lokal, lalu tarik data asli dari Sheet diam-diam
+        window.onload = () => {
+            initApp(); 
+            tarikDataGoogleSheet();
+        };
+
+        // FUNGSI SYNC BANNER (BACKGROUND LOADING)
+        let syncTimeout;
+        function setSyncStatus(isSyncing, text = "Menyinkronkan...") {
+            const banner = document.getElementById('syncBanner');
+            document.getElementById('syncText').innerText = text;
+            clearTimeout(syncTimeout);
+
+            if (isSyncing) {
+                banner.classList.add('show');
+            } else {
+                // Tahan banner sebentar biar kelihatan kalau sukses, lalu hilangkan
+                syncTimeout = setTimeout(() => {
+                    banner.classList.remove('show');
+                }, 1500);
+            }
+        }
 
         async function tarikDataGoogleSheet() {
-            setLoading(true, "Mengambil data dari Google Sheet...");
+            setSyncStatus(true, "Mengunduh pembaruan dari awan...");
             try {
                 const response = await fetch(URL_GOOGLE_SHEET);
                 dbBarang = await response.json();
-                initApp();
-                showToast("Data tersinkronisasi!");
+                
+                // Simpan ke memori HP
+                localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
+                
+                // Perbarui tampilan web tanpa mengganggu pengguna
+                initApp(); 
+                terapkanFilter(); 
+                setSyncStatus(false, "Sinkronisasi selesai! ✅");
             } catch (error) {
                 console.error(error);
-                showToast("Gagal mengambil data. Cek koneksi internet.");
+                setSyncStatus(false, "Mode Offline Aktif ⚠");
             }
-            setLoading(false);
         }
 
         async function pushDataKeGoogleSheet() {
-            setLoading(true, "Menyimpan ke Google Sheet...");
+            setSyncStatus(true, "Menyimpan perubahan ke awan...");
             try {
+                // Simpan ke memori HP dulu biar cepat
+                localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
+
+                // Lempar datanya ke Google Sheet
                 await fetch(URL_GOOGLE_SHEET, {
                     method: 'POST',
                     body: JSON.stringify(dbBarang)
                 });
-                initApp();
-                terapkanFilter(); // Refresh tampilan list kalau lagi di tab list
-                showToast("Berhasil update ke Sheet!");
+                
+                setSyncStatus(false, "Tersimpan aman! ✅");
             } catch (error) {
                 console.error(error);
-                showToast("Gagal mengupload data!");
+                setSyncStatus(false, "Gagal upload. Menunggu koneksi... ⚠");
+                showToast("Koneksi bermasalah. Data tersimpan di HP sementara.");
             }
-            setLoading(false);
-        }
-
-        function setLoading(isActive, text = "") {
-            document.getElementById('loadingScreen').style.display = isActive ? 'flex' : 'none';
-            document.getElementById('loadingText').innerText = text;
         }
 
         function initApp() {
@@ -286,8 +312,8 @@
             return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
         }
 
-        // --- MANAJEMEN DATA ---
-        async function simpanBarang() {
+        // --- MANAJEMEN DATA (SEKARANG UI INSTAN!) ---
+        function simpanBarang() {
             const nama = document.getElementById('nama').value;
             const modis = document.getElementById('modis').value;
             const shelf = document.getElementById('shelf').value;
@@ -299,16 +325,68 @@
                 alert("Isi semua data lokasinya ya!"); return;
             }
 
+            // 1. Ubah data lokal langsung
             dbBarang.push({
                 id: Date.now().toString(),
                 nama, modis, shelf: parseInt(shelf), baris: parseInt(baris), 
                 expDate, tarikDays: parseInt(tarikDays)
             });
 
+            // 2. Kosongkan form dan kasih toast seketika (UX Instan)
             ['nama','modis','shelf','baris','expDate','tarikDays'].forEach(id => document.getElementById(id).value = '');
+            showToast("Data ditambahkan!");
+            initApp();
             
-            // Push ke awan
-            await pushDataKeGoogleSheet();
+            // 3. Sinkronisasi berjalan diam-diam di background
+            pushDataKeGoogleSheet();
+        }
+
+        function simpanTindakan() {
+            const id = document.getElementById('editId').value;
+            const newExp = document.getElementById('editExpDate').value;
+            const newTarik = document.getElementById('editTarikDays').value;
+
+            if(!newExp || !newTarik) return alert("Isi formnya dulu!");
+
+            let index = dbBarang.findIndex(x => x.id === id);
+            if(index !== -1) {
+                // 1. Ubah data instan
+                dbBarang[index].expDate = newExp;
+                dbBarang[index].tarikDays = parseInt(newTarik);
+                
+                // 2. Tutup modal & perbarui UI instan
+                tutupModal();
+                initApp();
+                terapkanFilter();
+                showToast("Pembaruan berhasil!");
+
+                // 3. Upload background
+                pushDataKeGoogleSheet();
+            }
+        }
+
+        function hapusBarangDariSistem() {
+            const id = document.getElementById('editId').value;
+            if(confirm("Yakin barang ini sudah ditarik dan mau dihapus permanen dari sistem?")) {
+                dbBarang = dbBarang.filter(x => x.id !== id);
+                tutupModal();
+                initApp();
+                terapkanFilter();
+                showToast("Barang dihapus!");
+                pushDataKeGoogleSheet();
+            }
+        }
+
+        function resetSemuaData() {
+            if (confirm("🚨 PERINGATAN BAHAYA 🚨\n\nApakah kamu YAKIN ingin MENGHAPUS SEMUA DATA BARANG?")) {
+                if (confirm("TINDAKAN INI TIDAK BISA DIBATALKAN!\n\nLanjutkan?")) {
+                    dbBarang = []; 
+                    initApp();
+                    terapkanFilter();
+                    showToast("Sapu jagat berhasil!");
+                    pushDataKeGoogleSheet(); 
+                }
+            }
         }
 
         // --- FILTER & RENDER ---
@@ -423,44 +501,6 @@
         }
 
         function tutupModal() { document.getElementById('modalTindakan').classList.remove('active'); }
-
-        async function simpanTindakan() {
-            const id = document.getElementById('editId').value;
-            const newExp = document.getElementById('editExpDate').value;
-            const newTarik = document.getElementById('editTarikDays').value;
-
-            if(!newExp || !newTarik) return alert("Isi formnya dulu!");
-
-            let index = dbBarang.findIndex(x => x.id === id);
-            if(index !== -1) {
-                dbBarang[index].expDate = newExp;
-                dbBarang[index].tarikDays = parseInt(newTarik);
-                tutupModal();
-                await pushDataKeGoogleSheet();
-            }
-        }
-
-        async function hapusBarangDariSistem() {
-            const id = document.getElementById('editId').value;
-            if(confirm("Yakin barang ini sudah ditarik dan mau dihapus permanen dari sistem?")) {
-                dbBarang = dbBarang.filter(x => x.id !== id);
-                tutupModal();
-                await pushDataKeGoogleSheet();
-            }
-        }
-
-        // FUNGSI BARU: RESET SEMUA DATA
-        async function resetSemuaData() {
-            const yakinPertama = confirm("🚨 PERINGATAN BAHAYA 🚨\n\nApakah kamu YAKIN ingin MENGHAPUS SEMUA DATA BARANG?");
-            if (yakinPertama) {
-                const yakinKedua = confirm("TINDAKAN INI TIDAK BISA DIBATALKAN!\n\nData di aplikasi dan Google Sheet akan hilang PERMANEN. Lanjutkan?");
-                if (yakinKedua) {
-                    dbBarang = []; // Kosongkan array secara lokal
-                    await pushDataKeGoogleSheet(); // Push kekosongan ini ke awan
-                    showToast("Sapu jagat berhasil! Semua data bersih.");
-                }
-            }
-        }
     </script>
 </body>
 </html>

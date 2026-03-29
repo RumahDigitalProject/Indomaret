@@ -12,10 +12,10 @@
             margin: 0;
             padding: 0;
             width: 100%;
-            overflow-x: hidden; /* Mengunci layar agar tidak geser kiri/kanan */
-            touch-action: pan-y; /* Hanya izinkan scroll atas-bawah */
+            overflow-x: hidden;
+            touch-action: pan-y;
             font-family: 'Poppins', sans-serif;
-            background-color: #0f172a; /* Dark background */
+            background-color: #0f172a;
             color: #f8fafc;
         }
 
@@ -37,18 +37,8 @@
             border-bottom-right-radius: 20px;
         }
         
-        header h1 {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        
-        header p {
-            margin: 5px 0 0;
-            font-size: 12px;
-            color: #bfdbfe;
-        }
+        header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+        header p { margin: 5px 0 0; font-size: 12px; color: #bfdbfe; }
 
         /* NAVIGATION TABS */
         .nav-tabs {
@@ -69,6 +59,7 @@
             font-family: 'Poppins', sans-serif;
             cursor: pointer;
             transition: 0.3s;
+            font-size: 13px;
         }
         
         .tab-btn.active {
@@ -79,18 +70,10 @@
         }
 
         /* CONTAINER */
-        .container {
-            padding: 0 20px 80px 20px;
-            width: 100%;
-        }
+        .container { padding: 0 20px 80px 20px; width: 100%; }
 
-        .page {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-        .page.active {
-            display: block;
-        }
+        .page { display: none; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -110,17 +93,8 @@
         h2 { margin-top: 0; font-size: 18px; color: #f8fafc; }
 
         /* FORM INPUTS */
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            font-size: 13px;
-            color: #94a3b8;
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 6px; font-weight: 500; }
         
         input {
             width: 100%;
@@ -140,10 +114,7 @@
             box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
         }
 
-        .input-row {
-            display: flex;
-            gap: 10px;
-        }
+        .input-row { display: flex; gap: 10px; }
         .input-row .form-group { flex: 1; }
 
         /* BUTTONS */
@@ -163,108 +134,97 @@
         }
         
         .btn-action {
-            background: #334155;
+            background: #3b82f6;
             border: none;
             color: white;
-            padding: 8px 12px;
+            padding: 10px 12px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 600;
             font-family: 'Poppins', sans-serif;
             cursor: pointer;
             margin-top: 10px;
             width: 100%;
         }
 
-        /* NOTIFICATION CARDS (DASHBOARD) */
+        /* NOTIFICATION CARDS */
         .alert-card {
             padding: 16px;
             border-radius: 12px;
             margin-bottom: 15px;
             position: relative;
             overflow: hidden;
+            background: #0f172a;
+            border: 1px solid #334155;
         }
         
         .alert-card::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 6px;
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
         }
 
-        /* DANGER: Sudah Expired */
-        .alert-danger {
-            background: rgba(220, 38, 38, 0.1);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-        }
+        .alert-danger { background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.3); }
         .alert-danger::before { background: #dc2626; }
         .alert-danger .badge { color: #fca5a5; }
 
-        /* WARNING: Waktunya Tarik */
-        .alert-warning {
-            background: rgba(234, 179, 8, 0.1);
-            border: 1px solid rgba(234, 179, 8, 0.3);
-        }
+        .alert-warning { background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.3); }
         .alert-warning::before { background: #eab308; }
         .alert-warning .badge { color: #fef08a; }
 
-        /* SAFE: Masih Aman */
-        .alert-safe {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
         .alert-safe::before { background: #22c55e; }
 
-        .item-name {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
+        .item-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
         
         .item-location {
-            font-size: 13px;
-            color: #cbd5e1;
-            margin-bottom: 8px;
-            display: inline-flex;
-            align-items: center;
-            background: #0f172a;
-            padding: 4px 10px;
-            border-radius: 6px;
+            font-size: 13px; color: #cbd5e1; margin-bottom: 8px;
+            display: inline-flex; align-items: center;
+            background: #1e293b; padding: 4px 10px; border-radius: 6px; border: 1px solid #334155;
         }
 
-        .item-details {
-            font-size: 12px;
-            color: #94a3b8;
-            display: flex;
-            justify-content: space-between;
+        .item-details { font-size: 12px; color: #94a3b8; display: flex; justify-content: space-between; }
+
+        /* SEARCH BAR */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            padding-left: 40px;
+            border-color: #3b82f6;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+
+        /* MODAL TINDAKAN */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(5px);
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
+        .modal-content {
+            background: #1e293b; width: 90%; max-width: 400px; padding: 25px;
+            border-radius: 20px; border: 1px solid #3b82f6; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .btn-close-modal {
+            background: transparent; color: #94a3b8; border: 1px solid #475569;
+            width: 100%; padding: 12px; border-radius: 10px; margin-top: 10px; font-weight: 600;
         }
 
         /* TOAST */
         #toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #10b981;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 600;
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
-            transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            z-index: 1000;
-            white-space: nowrap;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #10b981; color: white; padding: 12px 24px; border-radius: 30px;
+            font-size: 14px; font-weight: 600; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 1000; white-space: nowrap;
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
-        #toast.error { background: #ef4444; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); }
 
-        /* EMPTY STATE */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #64748b;
-        }
-        .empty-state text { font-size: 40px; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #64748b; }
     </style>
 </head>
 <body>
@@ -275,22 +235,17 @@
     </header>
 
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('dashboard')">Notif Tarik 🔔</button>
-        <button class="tab-btn" onclick="switchTab('input')">Input Data ✍️</button>
-        <button class="tab-btn" onclick="switchTab('list')">List Semua 📋</button>
+        <button class="tab-btn active" onclick="switchTab('dashboard')">Notif 🔔</button>
+        <button class="tab-btn" onclick="switchTab('input')">Input ✍️</button>
+        <button class="tab-btn" onclick="switchTab('list')">Cari 🔍</button>
     </div>
 
     <div class="container">
 
         <div id="page-dashboard" class="page active">
             <div class="card">
-                <h2>🚨 Tindakan Segera</h2>
-                <p style="font-size:12px; color:#94a3b8; margin-top:-10px; margin-bottom:20px;">
-                    Barang yang harus segera ditarik dari rak hari ini.
-                </p>
-                
-                <div id="actionList">
-                    </div>
+                <h2>🚨 Butuh Tindakan</h2>
+                <div id="actionList"></div>
             </div>
         </div>
 
@@ -303,10 +258,12 @@
                     <input type="text" id="nama" placeholder="Contoh: Chitato Sapi Panggang 68g">
                 </div>
 
+                <datalist id="modisHistory"></datalist>
+
                 <div class="input-row">
                     <div class="form-group">
                         <label>Jenis Modis</label>
-                        <input type="text" id="modis" placeholder="Contoh: Snack">
+                        <input type="text" id="modis" list="modisHistory" placeholder="Ketik/Pilih Modis">
                     </div>
                     <div class="form-group">
                         <label>Stok</label>
@@ -331,7 +288,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Tarik H- Berapa? (Dalam Hari)</label>
+                    <label>Tarik H- Berapa?</label>
                     <input type="number" id="tarikDays" placeholder="Contoh: 60 (Untuk 2 Bulan)">
                 </div>
 
@@ -341,21 +298,48 @@
 
         <div id="page-list" class="page">
             <div class="card">
-                <h2>📋 Semua Data Barang</h2>
-                <div id="allList">
-                    </div>
+                <h2>🔍 Cari Letak Barang</h2>
+                <div class="search-box">
+                    <span class="search-icon">🔎</span>
+                    <input type="text" id="searchInput" placeholder="Ketik Nama, Modis, Shelf, atau Baris..." onkeyup="filterPencarian()">
+                </div>
+                <div id="allList"></div>
             </div>
         </div>
 
     </div>
 
+    <div id="modalTindakan" class="modal-overlay">
+        <div class="modal-content">
+            <h2>🔄 Tindakan Penyelesaian</h2>
+            <p id="modalNamaBarang" style="font-size: 14px; font-weight: bold; color: #60a5fa; margin-bottom: 20px;"></p>
+            
+            <input type="hidden" id="editId">
+            
+            <div class="form-group">
+                <label>Ganti Tanggal Expired Baru</label>
+                <input type="date" id="editExpDate">
+            </div>
+
+            <div class="form-group">
+                <label>Masa Tarik Baru (H- Hari)</label>
+                <input type="number" id="editTarikDays">
+            </div>
+
+            <button class="btn-primary" onclick="simpanTindakan()">Simpan Pembaruan</button>
+            <button class="btn-close-modal" onclick="tutupModal()">Batal</button>
+        </div>
+    </div>
+
     <div id="toast">Notifikasi</div>
 
     <script>
-        // Inisialisasi Database
         let dbBarang = JSON.parse(localStorage.getItem('returHubDB')) || [];
 
-        // Fungsi Navigasi Tab
+        // Inisialisasi awal
+        updateModisDatalist();
+        renderDashboard();
+
         function switchTab(tabId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -364,18 +348,31 @@
             event.target.classList.add('active');
 
             if(tabId === 'dashboard') renderDashboard();
-            if(tabId === 'list') renderAllList();
+            if(tabId === 'list') {
+                document.getElementById('searchInput').value = '';
+                renderAllList();
+            }
         }
 
-        // Fungsi Toast Notification
-        function showToast(msg, isError = false) {
+        function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
-            toast.className = isError ? 'error show' : 'show';
+            toast.className = 'show';
             setTimeout(() => { toast.className = ''; }, 3000);
         }
 
-        // Fungsi Simpan Barang
+        // FUNGSI UPDATE AUTOCOMPLETE MODIS
+        function updateModisDatalist() {
+            const datalist = document.getElementById('modisHistory');
+            // Ambil semua modis yang unik
+            const uniqueModis = [...new Set(dbBarang.map(item => item.modis))];
+            
+            datalist.innerHTML = '';
+            uniqueModis.forEach(modis => {
+                if(modis) datalist.innerHTML += `<option value="${modis}">`;
+            });
+        }
+
         function simpanBarang() {
             const nama = document.getElementById('nama').value;
             const modis = document.getElementById('modis').value;
@@ -386,7 +383,7 @@
             const tarikDays = document.getElementById('tarikDays').value;
 
             if(!nama || !modis || !shelf || !baris || !expDate || !tarikDays) {
-                showToast("Semua kolom wajib diisi, bro!", true);
+                alert("Lengkapi datanya dulu, bro!");
                 return;
             }
 
@@ -398,74 +395,87 @@
             dbBarang.push(item);
             localStorage.setItem('returHubDB', JSON.stringify(dbBarang));
 
-            // Reset Form
             ['nama','modis','shelf','baris','stok','expDate','tarikDays'].forEach(id => {
                 document.getElementById(id).value = '';
             });
 
+            updateModisDatalist(); // Perbarui riwayat modis
             showToast("Mantap! Data berhasil disimpan.");
-            renderDashboard();
         }
 
-        // Fungsi Hapus Barang (Jika sudah ditarik/terjual habis)
-        function hapusBarang(id) {
-            if(confirm('Udah beres ditarik? Yakin mau hapus data ini?')) {
-                dbBarang = dbBarang.filter(item => item.id !== id);
-                localStorage.setItem('returHubDB', JSON.stringify(dbBarang));
-                renderDashboard();
-                renderAllList();
-                showToast("Data berhasil dihapus.");
-            }
-        }
-
-        // Format Tanggal Indo (Cth: 30 Apr 2026)
         function formatTanggal(tglString) {
             const d = new Date(tglString);
             return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         }
 
-        // Hitung Selisih Hari dari Hari Ini
         function hitungSelisihHari(tglTujuan) {
             const today = new Date();
             today.setHours(0,0,0,0);
             const target = new Date(tglTujuan);
             target.setHours(0,0,0,0);
-            const diffTime = target - today;
-            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
         }
 
-        // Render Data Dashboard (Hanya Warning & Expired)
+        /* LOGIKA MODAL TINDAKAN */
+        function bukaModalTindakan(id) {
+            const item = dbBarang.find(x => x.id === id);
+            if(!item) return;
+
+            document.getElementById('editId').value = item.id;
+            document.getElementById('modalNamaBarang').innerText = `${item.nama} (Modis: ${item.modis})`;
+            
+            // Isi otomatis dengan data yang sudah ada, biar user tinggal ganti
+            document.getElementById('editExpDate').value = item.expDate;
+            document.getElementById('editTarikDays').value = item.tarikDays;
+
+            document.getElementById('modalTindakan').classList.add('active');
+        }
+
+        function tutupModal() {
+            document.getElementById('modalTindakan').classList.remove('active');
+        }
+
+        function simpanTindakan() {
+            const id = document.getElementById('editId').value;
+            const newExp = document.getElementById('editExpDate').value;
+            const newTarik = document.getElementById('editTarikDays').value;
+
+            if(!newExp || !newTarik) {
+                alert("Tanggal Expired dan Masa Tarik harus diisi!");
+                return;
+            }
+
+            // Cari index barang dan update
+            const index = dbBarang.findIndex(x => x.id === id);
+            if(index !== -1) {
+                dbBarang[index].expDate = newExp;
+                dbBarang[index].tarikDays = parseInt(newTarik);
+                
+                localStorage.setItem('returHubDB', JSON.stringify(dbBarang));
+                tutupModal();
+                showToast("Sip! Data barang berhasil diperbarui.");
+                
+                // Refresh tampilan sesuai tab yang sedang aktif
+                renderDashboard();
+                renderAllList();
+            }
+        }
+
         function renderDashboard() {
             const listContainer = document.getElementById('actionList');
             listContainer.innerHTML = '';
 
-            if(dbBarang.length === 0) {
-                listContainer.innerHTML = `<div class="empty-state">📦<br>Belum ada data barang nih.</div>`;
-                return;
-            }
-
-            // Urutkan berdasarkan tanggal expired paling dekat
             let sortedDB = [...dbBarang].sort((a,b) => new Date(a.expDate) - new Date(b.expDate));
             let adaNotif = false;
 
             sortedDB.forEach(item => {
                 const hariMenujuExp = hitungSelisihHari(item.expDate);
-                const hariHarusDitarik = item.tarikDays;
-                
-                let statusClass = '';
-                let statusText = '';
-                let showCard = false;
+                let statusClass = '', statusText = '', showCard = false;
 
                 if (hariMenujuExp < 0) {
-                    // SUDAH LEWAT EXPIRED
-                    statusClass = 'alert-danger';
-                    statusText = '🔴 KADALUARSA! Buang Sekarang';
-                    showCard = true;
-                } else if (hariMenujuExp <= hariHarusDitarik) {
-                    // HARI H PENARIKAN (Atau sudah lewat hari penarikan tapi belum expired)
-                    statusClass = 'alert-warning';
-                    statusText = `🟡 TARIK! (Lewat batas H-${hariHarusDitarik})`;
-                    showCard = true;
+                    statusClass = 'alert-danger'; statusText = '🔴 KADALUARSA!'; showCard = true;
+                } else if (hariMenujuExp <= item.tarikDays) {
+                    statusClass = 'alert-warning'; statusText = `🟡 TARIK! (H-${hariMenujuExp})`; showCard = true;
                 }
 
                 if(showCard) {
@@ -473,58 +483,64 @@
                     listContainer.innerHTML += `
                         <div class="alert-card ${statusClass}">
                             <div class="item-name">${item.nama} <span class="badge" style="font-size:11px; float:right;">${statusText}</span></div>
-                            <div class="item-location">
-                                📍 Modis: ${item.modis} | Shelf: ${item.shelf} | Baris: ${item.baris}
-                            </div>
+                            <div class="item-location">📍 Modis: ${item.modis} | Shelf: ${item.shelf} | Baris: ${item.baris}</div>
                             <div class="item-details">
-                                <span>Exp: <b>${formatTanggal(item.expDate)}</b> (Sisa ${hariMenujuExp} Hari)</span>
+                                <span>Exp Lama: <b>${formatTanggal(item.expDate)}</b></span>
                                 <span>Stok: ${item.stok}</span>
                             </div>
-                            <button class="btn-action" onclick="hapusBarang('${item.id}')">Tandai Selesai & Hapus</button>
+                            <button class="btn-action" onclick="bukaModalTindakan('${item.id}')">🔄 Tindakan Penyelesaian</button>
                         </div>
                     `;
                 }
             });
 
-            if(!adaNotif) {
-                listContainer.innerHTML = `<div class="empty-state">✨<br>Aman bro! Nggak ada barang yang perlu ditarik.</div>`;
-            }
+            if(!adaNotif) listContainer.innerHTML = `<div class="empty-state">✨<br>Aman bro! Nggak ada barang yang perlu ditarik.</div>`;
         }
 
-        // Render Semua List
-        function renderAllList() {
+        // FUNGSI PENCARIAN (Dipanggil tiap kali ngetik di kotak pencarian)
+        function filterPencarian() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            renderAllList(query);
+        }
+
+        function renderAllList(query = '') {
             const listContainer = document.getElementById('allList');
             listContainer.innerHTML = '';
 
-            if(dbBarang.length === 0) {
-                listContainer.innerHTML = `<div class="empty-state">📦<br>Data kosong.</div>`;
+            // Filter data jika ada pencarian
+            let filteredDB = dbBarang;
+            if(query !== '') {
+                filteredDB = dbBarang.filter(item => 
+                    item.nama.toLowerCase().includes(query) ||
+                    item.modis.toLowerCase().includes(query) ||
+                    item.shelf.toLowerCase().includes(query) ||
+                    item.baris.toLowerCase().includes(query)
+                );
+            }
+
+            if(filteredDB.length === 0) {
+                listContainer.innerHTML = `<div class="empty-state">📦<br>Barang tidak ditemukan.</div>`;
                 return;
             }
 
-            dbBarang.forEach(item => {
+            filteredDB.forEach(item => {
                 const hariMenujuExp = hitungSelisihHari(item.expDate);
                 let badge = (hariMenujuExp <= item.tarikDays) ? '⚠️ Segera Tarik' : '✅ Aman';
                 if(hariMenujuExp < 0) badge = '❌ Expired';
 
                 listContainer.innerHTML += `
-                    <div class="alert-card alert-safe" style="border-color:#334155; background:#0f172a;">
-                        <div class="item-name">${item.nama} <span style="font-size:11px; float:right;">${badge}</span></div>
-                        <div class="item-location" style="background:#1e293b;">
-                            📍 Modis: ${item.modis} | S: ${item.shelf} | B: ${item.baris}
-                        </div>
+                    <div class="alert-card alert-safe">
+                        <div class="item-name">${item.nama} <span style="font-size:11px; float:right; color:#94a3b8">${badge}</span></div>
+                        <div class="item-location">📍 Modis: ${item.modis} | S: ${item.shelf} | B: ${item.baris}</div>
                         <div class="item-details">
                             <span>Exp: ${formatTanggal(item.expDate)}</span>
                             <span>Aturan Tarik: H-${item.tarikDays}</span>
                         </div>
-                        <button class="btn-action" style="background:#dc2626;" onclick="hapusBarang('${item.id}')">Hapus Data</button>
+                        <button class="btn-action" style="background:#475569; margin-top:10px;" onclick="bukaModalTindakan('${item.id}')">✏️ Edit / Update Expired</button>
                     </div>
                 `;
             });
         }
-
-        // Run on load
-        renderDashboard();
     </script>
 </body>
 </html>
-

@@ -54,18 +54,20 @@
         /* BUTTONS */
         .btn-primary {
             width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;
-            border: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 5px;
+            border: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 5px; cursor: pointer;
+        }
+        .btn-danger-outline {
+            width: 100%; background: transparent; color: #ef4444; border: 1px solid #ef4444;
+            padding: 12px; border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 15px; cursor: pointer;
         }
         .btn-action {
             background: #3b82f6; border: none; color: white; padding: 6px 10px;
             border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;
         }
 
-        /* FILTER BOX */
+        /* FILTER & SEARCH */
         .filter-container { display: flex; gap: 8px; margin-bottom: 10px; }
         .filter-container select { flex: 1; padding: 8px; font-size: 12px; }
-
-        /* SEARCH BAR */
         .search-box { position: relative; margin-bottom: 15px; }
         .search-box input { padding-left: 35px; border-color: #3b82f6; }
         .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 16px; }
@@ -86,17 +88,22 @@
         .badge.dang { background: #7f1d1d; color: #fca5a5; }
 
         .c-body { font-size: 11px; color: #94a3b8; display: flex; flex-direction: column; gap: 4px; }
-        .c-row { display: flex; justify-content: space-between; }
+        .c-row { display: flex; justify-content: space-between; align-items: center; }
         .highlight { color: #60a5fa; font-weight: 600; }
 
-        /* MODAL */
+        /* MODAL (Dioptimalkan agar bisa scroll jika layar kecil) */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(5px); align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.75); z-index: 999; backdrop-filter: blur(5px); align-items: center; justify-content: center;
         }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: #1e293b; width: 90%; max-width: 350px; padding: 20px; border-radius: 16px; border: 1px solid #3b82f6; }
-        .btn-close-modal { background: transparent; color: #94a3b8; border: 1px solid #475569; width: 100%; padding: 10px; border-radius: 8px; margin-top: 10px; }
+        .modal-content { 
+            background: #1e293b; width: 90%; max-width: 350px; padding: 20px; 
+            border-radius: 16px; border: 1px solid #3b82f6; 
+            max-height: 85vh; overflow-y: auto; /* Memungkinkan scroll di dalam modal */
+        }
+        .btn-close-modal { background: transparent; color: #94a3b8; border: 1px solid #475569; width: 100%; padding: 10px; border-radius: 8px; margin-top: 10px; cursor: pointer; }
+        .btn-delete-item { background: #dc2626; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight: 600; cursor: pointer; }
 
         /* TOAST */
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #10b981; color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: 600; transition: 0.3s; z-index: 1000; }
@@ -114,7 +121,7 @@
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchTab('dashboard')">Notif 🔔</button>
         <button class="tab-btn" onclick="switchTab('input')">Input ✍️</button>
-        <button class="tab-btn" onclick="switchTab('list')">Filter & Cari 🔍</button>
+        <button class="tab-btn" onclick="switchTab('list')">Cari & Data 🔍</button>
     </div>
 
     <div class="container">
@@ -140,7 +147,7 @@
                 </div>
                 <div class="input-row">
                     <div class="form-group">
-                        <label>Shelving (Nomor Rak)</label>
+                        <label>Shelving (Rak)</label>
                         <input type="number" id="shelf" placeholder="Contoh: 3">
                     </div>
                     <div class="form-group">
@@ -181,6 +188,11 @@
                 </div>
 
                 <div id="allList"></div>
+
+                <div style="margin-top: 30px; border-top: 1px solid #334155; padding-top: 20px;">
+                    <button class="btn-danger-outline" onclick="resetSemuaData()">⚠️ Reset / Hapus Semua Data</button>
+                    <p style="font-size: 10px; color: #64748b; text-align: center; margin-top: 8px;">Gunakan hanya jika ingin memulai pendataan dari awal</p>
+                </div>
             </div>
         </div>
 
@@ -188,12 +200,46 @@
 
     <div id="modalTindakan" class="modal-overlay">
         <div class="modal-content">
-            <h2>🔄 Tindakan Penyelesaian</h2>
-            <p id="modalNamaBarang" style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-bottom: 15px;"></p>
+            <h2 style="margin-bottom: 15px;">✏️ Edit Data Barang</h2>
+            
             <input type="hidden" id="editId">
-            <div class="form-group"><label>Ganti Tanggal Expired Baru</label><input type="date" id="editExpDate"></div>
-            <div class="form-group"><label>Masa Tarik Baru (H- Hari)</label><input type="number" id="editTarikDays"></div>
-            <button class="btn-primary" onclick="simpanTindakan()">Simpan Pembaruan</button>
+            
+            <div class="form-group">
+                <label>Nama Produk</label>
+                <input type="text" id="editNama">
+            </div>
+            
+            <div class="form-group">
+                <label>Modis</label>
+                <input type="text" id="editModis" list="modisHistory">
+            </div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label>Shelving</label>
+                    <input type="number" id="editShelf">
+                </div>
+                <div class="form-group">
+                    <label>Baris</label>
+                    <input type="number" id="editBaris">
+                </div>
+            </div>
+
+            <div style="border-top: 1px dashed #475569; margin: 15px 0;"></div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label>Tgl Expired Baru</label>
+                    <input type="date" id="editExpDate">
+                </div>
+                <div class="form-group">
+                    <label>Tarik H-</label>
+                    <input type="number" id="editTarikDays">
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="simpanTindakan()">Simpan Perubahan</button>
+            <button class="btn-delete-item" onclick="hapusBarangSatu()">🗑️ Hapus Barang Ini</button>
             <button class="btn-close-modal" onclick="tutupModal()">Batal</button>
         </div>
     </div>
@@ -202,9 +248,6 @@
 
     <script>
         let dbBarang = JSON.parse(localStorage.getItem('returHubDB')) || [];
-
-        // Hapus property 'stok' dari data lama jika ada (Biar bersih)
-        dbBarang.forEach(item => delete item.stok);
 
         initApp();
 
@@ -224,7 +267,7 @@
             if(tabId === 'list') {
                 document.getElementById('searchInput').value = '';
                 document.getElementById('filterModis').value = '';
-                updateFilterShelf(); // Reset shelf
+                updateFilterShelf(); 
             }
         }
 
@@ -244,7 +287,7 @@
             return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
         }
 
-        // --- MANAJEMEN DATA ---
+        // --- SIMPAN BARANG BARU ---
         function simpanBarang() {
             const nama = document.getElementById('nama').value;
             const modis = document.getElementById('modis').value;
@@ -263,14 +306,18 @@
                 expDate, tarikDays: parseInt(tarikDays)
             });
 
-            localStorage.setItem('returHubDB', JSON.stringify(dbBarang));
+            simpanKeLocal();
             ['nama','modis','shelf','baris','expDate','tarikDays'].forEach(id => document.getElementById(id).value = '');
-            
-            initApp();
-            showToast("Data tersimpan & terorganisir!");
+            showToast("Data tersimpan!");
         }
 
-        // --- AUTOCOMPLETE & FILTER DROPDOWN ---
+        function simpanKeLocal() {
+            localStorage.setItem('returHubDB', JSON.stringify(dbBarang));
+            initApp();
+            if(document.getElementById('page-list').classList.contains('active')) terapkanFilter();
+        }
+
+        // --- AUTOCOMPLETE & FILTER ---
         function updateModisDatalist() {
             const unikModis = [...new Set(dbBarang.map(i => i.modis))];
             document.getElementById('modisHistory').innerHTML = unikModis.map(m => `<option value="${m}">`).join('');
@@ -281,9 +328,8 @@
             const unikModis = [...new Set(dbBarang.map(i => i.modis))].sort();
             
             let currentVal = optModis.value;
-            optModis.innerHTML = '<option value="">Semua Modis</option>' + 
-                                 unikModis.map(m => `<option value="${m}">${m}</option>`).join('');
-            optModis.value = currentVal; // Keep selected if exists
+            optModis.innerHTML = '<option value="">Semua Modis</option>' + unikModis.map(m => `<option value="${m}">${m}</option>`).join('');
+            optModis.value = currentVal;
             updateFilterShelf();
         }
 
@@ -291,21 +337,16 @@
             const pilihModis = document.getElementById('filterModis').value;
             const optShelf = document.getElementById('filterShelf');
             
-            // Cari shelf yang cuma ada di modis yang dipilih
             let filteredShelfData = dbBarang;
-            if (pilihModis !== '') {
-                filteredShelfData = dbBarang.filter(i => i.modis === pilihModis);
-            }
+            if (pilihModis !== '') filteredShelfData = dbBarang.filter(i => i.modis === pilihModis);
             
             const unikShelf = [...new Set(filteredShelfData.map(i => i.shelf))].sort((a,b) => a - b);
             
-            optShelf.innerHTML = '<option value="">Semua Shelving</option>' + 
-                                 unikShelf.map(s => `<option value="${s}">Shelving ${s}</option>`).join('');
-            
+            optShelf.innerHTML = '<option value="">Semua Shelving</option>' + unikShelf.map(s => `<option value="${s}">Shelving ${s}</option>`).join('');
             terapkanFilter();
         }
 
-        // --- RENDER DAFTAR BARANG (COMPACT & SORTED) ---
+        // --- RENDER DAFTAR (TAB CARI) ---
         function terapkanFilter() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const fModis = document.getElementById('filterModis').value;
@@ -321,7 +362,6 @@
                 return mQuery && mModis && mShelf;
             });
 
-            // URUTKAN SECARA LOGIS: Berdasarkan Modis -> Shelving -> Baris
             dataSaring.sort((a, b) => {
                 if(a.modis !== b.modis) return a.modis.localeCompare(b.modis);
                 if(a.shelf !== b.shelf) return a.shelf - b.shelf;
@@ -347,8 +387,8 @@
                         </div>
                         <div class="c-body">
                             <div class="c-row">
-                                <span>📍 <span class="highlight">${item.modis}</span> | Shelf: <b>${item.shelf}</b> | Baris: <b>${item.baris}</b></span>
-                                <button class="btn-action" onclick="bukaModalTindakan('${item.id}')">Edit</button>
+                                <span>📍 <span class="highlight">${item.modis}</span> | S: <b>${item.shelf}</b> | B: <b>${item.baris}</b></span>
+                                <button class="btn-action" onclick="bukaModalTindakan('${item.id}')">✏️ Edit</button>
                             </div>
                             <div class="c-row">
                                 <span>⏳ Exp: ${formatTanggal(item.expDate)} (Tarik H-${item.tarikDays})</span>
@@ -359,13 +399,13 @@
             });
         }
 
-        // --- RENDER DASHBOARD NOTIFIKASI ---
+        // --- RENDER DASHBOARD (NOTIF TARIK) ---
         function renderDashboard() {
             const listContainer = document.getElementById('actionList');
             listContainer.innerHTML = '';
             
             let dataNotif = dbBarang.filter(i => hitungSelisihHari(i.expDate) <= i.tarikDays);
-            dataNotif.sort((a,b) => new Date(a.expDate) - new Date(b.expDate)); // Urutkan dari yg paling kadaluarsa
+            dataNotif.sort((a,b) => new Date(a.expDate) - new Date(b.expDate)); 
 
             if(dataNotif.length === 0) {
                 listContainer.innerHTML = `<div class="empty-state">✨<br>Aman bro! Nggak ada jadwal narik barang.</div>`; return;
@@ -384,22 +424,29 @@
                             <span class="badge ${tipe}">${txtBadge}</span>
                         </div>
                         <div class="c-body">
-                            <span>📍 ${item.modis} | S: ${item.shelf} | B: ${item.baris}</span>
+                            <div class="c-row">
+                                <span>📍 ${item.modis} | S: ${item.shelf} | B: ${item.baris}</span>
+                                <button class="btn-action" style="background:#475569" onclick="bukaModalTindakan('${item.id}')">Tindakan</button>
+                            </div>
                             <span>⏳ Exp: ${formatTanggal(item.expDate)}</span>
-                            <button class="btn-action" style="margin-top:6px; background:#475569" onclick="bukaModalTindakan('${item.id}')">🔄 Selesaikan Tindakan</button>
                         </div>
                     </div>
                 `;
             });
         }
 
-        // --- MODAL TINDAKAN PENYELESAIAN ---
+        // --- MODAL FULL EDIT & TINDAKAN ---
         function bukaModalTindakan(id) {
             const item = dbBarang.find(x => x.id === id);
+            
             document.getElementById('editId').value = item.id;
-            document.getElementById('modalNamaBarang').innerText = `${item.nama} (${item.modis} S:${item.shelf} B:${item.baris})`;
+            document.getElementById('editNama').value = item.nama;
+            document.getElementById('editModis').value = item.modis;
+            document.getElementById('editShelf').value = item.shelf;
+            document.getElementById('editBaris').value = item.baris;
             document.getElementById('editExpDate').value = item.expDate;
             document.getElementById('editTarikDays').value = item.tarikDays;
+            
             document.getElementById('modalTindakan').classList.add('active');
         }
 
@@ -407,18 +454,55 @@
 
         function simpanTindakan() {
             const id = document.getElementById('editId').value;
+            
+            const newNama = document.getElementById('editNama').value;
+            const newModis = document.getElementById('editModis').value;
+            const newShelf = document.getElementById('editShelf').value;
+            const newBaris = document.getElementById('editBaris').value;
             const newExp = document.getElementById('editExpDate').value;
             const newTarik = document.getElementById('editTarikDays').value;
 
-            if(!newExp || !newTarik) return alert("Isi formnya dulu!");
+            if(!newNama || !newModis || !newShelf || !newBaris || !newExp || !newTarik) {
+                return alert("Semua kolom harus terisi!");
+            }
 
             let index = dbBarang.findIndex(x => x.id === id);
             if(index !== -1) {
+                dbBarang[index].nama = newNama;
+                dbBarang[index].modis = newModis;
+                dbBarang[index].shelf = parseInt(newShelf);
+                dbBarang[index].baris = parseInt(newBaris);
                 dbBarang[index].expDate = newExp;
                 dbBarang[index].tarikDays = parseInt(newTarik);
-                localStorage.setItem('returHubDB', JSON.stringify(dbBarang));
-                tutupModal(); showToast("Data berhasil di-update!");
-                initApp(); terapkanFilter(); // Refresh tampilan
+                
+                simpanKeLocal();
+                tutupModal(); 
+                showToast("Data berhasil di-update!");
+            }
+        }
+
+        // --- HAPUS SATU BARANG ---
+        function hapusBarangSatu() {
+            const id = document.getElementById('editId').value;
+            if(confirm("Yakin mau menghapus barang ini selamanya?")) {
+                dbBarang = dbBarang.filter(x => x.id !== id);
+                simpanKeLocal();
+                tutupModal();
+                showToast("Barang berhasil dihapus.");
+            }
+        }
+
+        // --- RESET SEMUA DATA (MASTER CLEAR) ---
+        function resetSemuaData() {
+            const validasi1 = confirm("⚠️ PERINGATAN ⚠️\nApakah kamu yakin ingin MENGHAPUS SEMUA DATA barang?");
+            if(validasi1) {
+                const validasi2 = confirm("Data yang dihapus tidak bisa dikembalikan. Lanjutkan reset?");
+                if(validasi2) {
+                    dbBarang = [];
+                    localStorage.removeItem('returHubDB');
+                    simpanKeLocal();
+                    showToast("Database berhasil direset (kosong).");
+                }
             }
         }
     </script>

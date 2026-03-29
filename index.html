@@ -180,6 +180,12 @@
                 </div>
                 <div id="allList"></div>
             </div>
+
+            <div class="card" style="border-color: #dc2626; background: rgba(220, 38, 38, 0.05); text-align: center; margin-top: 30px;">
+                <h3 style="color: #fca5a5; margin-top: 0; font-size: 14px;">⚠️ Zona Bahaya</h3>
+                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 15px;">Gunakan tombol ini jika ingin menghapus seluruh data barang untuk memulai dari nol.</p>
+                <button class="btn-danger" style="margin-top: 0;" onclick="resetSemuaData()">🚨 Reset Semua Data</button>
+            </div>
         </div>
     </div>
 
@@ -231,7 +237,7 @@
                 });
                 initApp();
                 terapkanFilter(); // Refresh tampilan list kalau lagi di tab list
-                showToast("Berhasil diupload ke Sheet!");
+                showToast("Berhasil update ke Sheet!");
             } catch (error) {
                 console.error(error);
                 showToast("Gagal mengupload data!");
@@ -442,7 +448,19 @@
                 await pushDataKeGoogleSheet();
             }
         }
+
+        // FUNGSI BARU: RESET SEMUA DATA
+        async function resetSemuaData() {
+            const yakinPertama = confirm("🚨 PERINGATAN BAHAYA 🚨\n\nApakah kamu YAKIN ingin MENGHAPUS SEMUA DATA BARANG?");
+            if (yakinPertama) {
+                const yakinKedua = confirm("TINDAKAN INI TIDAK BISA DIBATALKAN!\n\nData di aplikasi dan Google Sheet akan hilang PERMANEN. Lanjutkan?");
+                if (yakinKedua) {
+                    dbBarang = []; // Kosongkan array secara lokal
+                    await pushDataKeGoogleSheet(); // Push kekosongan ini ke awan
+                    showToast("Sapu jagat berhasil! Semua data bersih.");
+                }
+            }
+        }
     </script>
 </body>
 </html>
-

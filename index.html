@@ -1,569 +1,530 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Retail Inventory</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ReturHub - Inventory & Expired Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* RESET & PENCEGAH GESER SAMPING */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden; /* Mengunci layar agar tidak geser kiri/kanan */
+            touch-action: pan-y; /* Hanya izinkan scroll atas-bawah */
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a; /* Dark background */
+            color: #f8fafc;
+        }
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-<style>
-body{font-family:Segoe UI;margin:0;background:#eef1f5;}
-header{background:#111827;color:white;padding:15px;font-size:20px;}
-.container{padding:20px;}
-.card{background:white;padding:20px;margin-bottom:20px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-button{background:#2563eb;color:white;border:none;padding:10px 15px;border-radius:6px;cursor:pointer;margin:4px;}
-button:hover{background:#1d4ed8;}
-input,select{padding:8px;margin:4px;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-th,td{padding:10px;border:1px solid #ddd;}
-th{background:#1f2937;color:white;}
-#reader,#readerSearch{width:320px;margin-top:10px;}
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        header p {
+            margin: 5px 0 0;
+            font-size: 12px;
+            color: #bfdbfe;
+        }
 
-/* TOAST */
-#toast{
-position:fixed;
-top:20px;
-right:20px;
-background:#111827;
-color:white;
-padding:12px 20px;
-border-radius:8px;
-opacity:0;
-transform:translateY(-20px);
-transition:0.3s;
-z-index:999;
-}
-#toast.show{opacity:1;transform:translateY(0);}
-.toast-success{background:#16a34a;}
-.toast-error{background:#dc2626;}
-</style>
+        /* NAVIGATION TABS */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            background: #1e293b;
+            color: #94a3b8;
+            border: 2px solid transparent;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: rgba(37, 99, 235, 0.1);
+            color: #3b82f6;
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        /* CONTAINER */
+        .container {
+            padding: 0 20px 80px 20px;
+            width: 100%;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CARDS */
+        .card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #334155;
+        }
+
+        h2 { margin-top: 0; font-size: 18px; color: #f8fafc; }
+
+        /* FORM INPUTS */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+        
+        input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+        .input-row .form-group { flex: 1; }
+
+        /* BUTTONS */
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            margin-top: 10px;
+        }
+        
+        .btn-action {
+            background: #334155;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        /* NOTIFICATION CARDS (DASHBOARD) */
+        .alert-card {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .alert-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 6px;
+        }
+
+        /* DANGER: Sudah Expired */
+        .alert-danger {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+        .alert-danger::before { background: #dc2626; }
+        .alert-danger .badge { color: #fca5a5; }
+
+        /* WARNING: Waktunya Tarik */
+        .alert-warning {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+        .alert-warning::before { background: #eab308; }
+        .alert-warning .badge { color: #fef08a; }
+
+        /* SAFE: Masih Aman */
+        .alert-safe {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .alert-safe::before { background: #22c55e; }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .item-location {
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            display: inline-flex;
+            align-items: center;
+            background: #0f172a;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .item-details {
+            font-size: 12px;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* TOAST */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            white-space: nowrap;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+        #toast.error { background: #ef4444; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+        .empty-state text { font-size: 40px; }
+    </style>
 </head>
-
 <body>
 
-<header>Retail Inventory Dashboard</header>
-
-<div class="container" id="mainPage">
-
-<!-- NOTIF -->
-<div class="card">
-<b>Barang Mendekati Expired</b>
-
-<h3>⚠ Hampir Expired</h3>
-<div id="warningList"></div>
-
-<h3 style="margin-top:15px">🔴 Sudah Expired</h3>
-<div id="expiredList"></div>
-</div>
-
-<!-- SCAN + LAPORAN HEADER -->
-<div class="card">
-
-<div style="display:flex;justify-content:space-between;align-items:center">
-
-<div>
-<h3>Tambah Barang</h3>
-<button onclick="startScanner()">Scan Barcode</button>
-</div>
-
-<div style="text-align:right">
-<h3>Laporan Barang</h3>
-<button onclick="openLaporan()">Data Laporan</button>
-</div>
-
-</div>
-
-<div id="reader"></div>
-</div>
-
-<!-- FORM -->
-<div class="card" id="formBarang" style="display:none">
-<h3>Data Barang</h3>
-
-<input id="barcode" readonly placeholder="Barcode">
-<input id="nama" placeholder="Nama Barang">
-<input id="rak" placeholder="Rak">
-<input id="shelf" placeholder="Shelfing">
-<input id="baris" placeholder="Baris">
-<input id="stok" type="number" placeholder="Jumlah">
-
-<br>
-
-<label>Expired</label>
-<input id="exp" type="date">
-
-<label>Hari Tarik Display</label>
-<input id="warning" placeholder="Contoh: 30">
-
-<br>
-
-<button onclick="saveItem()">Simpan Barang</button>
-</div>
-
-<!-- FILTER -->
-<div class="card">
-<h3>Filter Barang</h3>
-
-<select id="filterRak" onchange="updateShelfFilter()">
-<option value="">Semua Rak</option>
-</select>
-
-<select id="filterShelf" onchange="applyFilter()">
-<option value="">Semua Shelf</option>
-</select>
-</div>
-
-<!-- SEARCH -->
-<div class="card">
-<h3>Cari Barang</h3>
-
-<div style="display:flex;gap:5px;align-items:center">
-<input id="searchInput" placeholder="Cari nama barang..." style="flex:1" onkeydown="handleEnter(event)">
-<button onclick="clearSearch()">❌</button>
-<button onclick="startSearchScanner()">Scan</button>
-</div>
-
-<div id="readerSearch"></div>
-<div id="searchResult"></div>
-</div>
-
-<!-- TABLE -->
-<div class="card">
-<h3>Daftar Barang</h3>
-
-<table>
-<thead>
-<tr>
-<th>Barcode</th>
-<th>Nama</th>
-<th>Rak</th>
-<th>Shelf</th>
-<th>Baris</th>
-<th>Stok</th>
-<th>Expired</th>
-</tr>
-</thead>
-
-<tbody id="table"></tbody>
-</table>
-</div>
-
-<!-- LAPORAN LAMA (TETAP ADA, TIDAK DIHAPUS) -->
-<div class="card">
-<h3>Laporan Barang (Default)</h3>
-
-<table>
-<thead>
-<tr>
-<th>Nama</th>
-<th>Status</th>
-<th>Stok</th>
-<th>Tanggal</th>
-</tr>
-</thead>
-
-<tbody id="laporanTableDefault"></tbody>
-</table>
-</div>
-
-</div>
-
-<!-- HALAMAN LAPORAN KHUSUS -->
-<div id="laporanPage" style="display:none;padding:20px">
-
-<button onclick="closeLaporan()" style="background:#dc2626">❌ Tutup</button>
-
-<h2>Laporan Barang</h2>
-
-<table>
-<thead>
-<tr>
-<th>Nama</th>
-<th>Status</th>
-<th>Stok</th>
-<th>Tanggal</th>
-</tr>
-</thead>
-
-<tbody id="laporanTable"></tbody>
-</table>
-
-</div>
-
-<div id="toast"></div>
-<!-- TAMBAHKAN DI BAWAH <div id="toast"></div> (TIDAK MENGGANGGU APAPUN) -->
-<div id="formTindakan" class="card" style="display:none; position:fixed; bottom:20px; right:20px; width:300px; z-index:999;">
-<h3>Tindakan Barang</h3>
-
-<input id="t_nama" readonly placeholder="Nama Barang">
-<input id="t_stok" type="number" placeholder="Sisa Stok">
-<br>
-
-<label>Exp Baru</label>
-<input id="t_exp" type="date">
-
-<label>H- Notif</label>
-<input id="t_warning" type="number" placeholder="Contoh: 30">
-
-<label><input type="checkbox" id="t_exp"> Barang Expired</label><br>
-<label><input type="checkbox" id="t_terjual"> Barang Terjual</label>
-
-<br><br>
-
-<button onclick="simpanTindakan()">Simpan</button>
-<button onclick="tutupTindakan()" style="background:#6b7280">Batal</button>
-</div>
-<script>
-
-const el = id => document.getElementById(id)
-
-/* TOAST */
-function showToast(msg,type="success"){
-let t = el("toast")
-t.innerText = msg
-t.className = "show " + (type==="success"?"toast-success":"toast-error")
-setTimeout(()=>{ t.className="" },2500)
-}
-
-/* NAVIGASI LAPORAN */
-function openLaporan(){
-el("mainPage").style.display="none"
-el("laporanPage").style.display="block"
-}
-
-function closeLaporan(){
-el("laporanPage").style.display="none"
-el("mainPage").style.display="block"
-}
-
-/* DATABASE */
-let items = JSON.parse(localStorage.getItem("items")) || []
-let laporan = JSON.parse(localStorage.getItem("laporan")) || []
-
-function saveDB(){ localStorage.setItem("items", JSON.stringify(items)) }
-function saveLaporan(){ localStorage.setItem("laporan", JSON.stringify(laporan)) }
-
-function refreshAll(){
-loadItems()
-loadFilterRak()
-updateShelfFilter()
-loadLaporan()
-checkExpired()
-}
-
-/* SIMPAN */
-function saveItem(){
-
-if(!el("barcode").value){
-showToast("Scan barcode dulu","error")
-return
-}
-
-let item={
-barcode:el("barcode").value,
-nama:el("nama").value,
-rak:el("rak").value,
-shelf:el("shelf").value,
-baris:el("baris").value,
-stok:parseInt(el("stok").value || 0),
-exp:el("exp").value,
-warning:parseInt(el("warning").value || 30)
-}
-
-let index = items.findIndex(x=>x.barcode==item.barcode)
-
-if(index !== -1){
-items[index] = item
-}else{
-items.push(item)
-}
-
-saveDB()
-
-el("formBarang").style.display = "none"
-el("reader").innerHTML = ""
-
-["barcode","nama","rak","shelf","baris","stok","exp","warning"]
-.forEach(id => el(id).value = "")
-
-refreshAll()
-
-showToast("Barang berhasil disimpan")
-
-window.scrollTo({top:0, behavior:"smooth"})
-}
-
-/* LOAD */
-function loadItems(){
-let table=el("table")
-table.innerHTML=""
-items.forEach(i=>{
-table.innerHTML+=`
-<tr>
-<td>${i.barcode}</td>
-<td>${i.nama}</td>
-<td>${i.rak}</td>
-<td>${i.shelf}</td>
-<td>${i.baris}</td>
-<td>${i.stok}</td>
-<td>${i.exp}</td>
-</tr>`
-})
-}
-
-/* LAPORAN */
-function loadLaporan(){
-let t1=el("laporanTable")
-let t2=el("laporanTableDefault")
-
-t1.innerHTML=""
-t2.innerHTML=""
-
-laporan.forEach(l=>{
-let row=`
-<tr>
-<td>${l.nama}</td>
-<td>${l.status}</td>
-<td>${l.stok}</td>
-<td>${l.tanggal}</td>
-</tr>`
-t1.innerHTML+=row
-t2.innerHTML+=row
-})
-}
-
-/* SISANYA TETAP */
-function loadFilterRak(){
-let rakSet=[...new Set(items.map(i=>i.rak))]
-let rak=el("filterRak")
-rak.innerHTML='<option value="">Semua Rak</option>'
-rakSet.forEach(r=>rak.innerHTML+=`<option>${r}</option>`)
-}
-
-function updateShelfFilter(){
-let rak=el("filterRak").value
-let shelfSelect=el("filterShelf")
-shelfSelect.innerHTML='<option value="">Semua Shelf</option>'
-let filtered=items.filter(i=>!rak || i.rak==rak)
-let shelfSet=[...new Set(filtered.map(i=>i.shelf))]
-shelfSet.forEach(s=>shelfSelect.innerHTML+=`<option>${s}</option>`)
-applyFilter()
-}
-
-function applyFilter(){
-let rak=el("filterRak").value
-let shelf=el("filterShelf").value
-let table=el("table")
-table.innerHTML=""
-items.forEach(i=>{
-if((!rak||i.rak==rak)&&(!shelf||i.shelf==shelf)){
-table.innerHTML+=`
-<tr>
-<td>${i.barcode}</td>
-<td>${i.nama}</td>
-<td>${i.rak}</td>
-<td>${i.shelf}</td>
-<td>${i.baris}</td>
-<td>${i.stok}</td>
-<td>${i.exp}</td>
-</tr>`
-}
-})
-}
-
-function handleEnter(e){
-if(e.key==="Enter") searchItem()
-}
-
-function searchItem(){
-let key=el("searchInput").value.toLowerCase()
-let result=el("searchResult")
-result.innerHTML=""
-items.forEach(i=>{
-if(i.nama.toLowerCase().includes(key)){
-result.innerHTML+=`
-<div class="card">
-<b>${i.nama}</b><br>
-Rak ${i.rak} | Shelf ${i.shelf} | Baris ${i.baris}<br>
-Stok ${i.stok}<br>
-Exp ${i.exp}<br><br>
-
-<button onclick="editItem('${i.barcode}')">✏️ Edit</button>
-<button onclick="deleteItem('${i.barcode}')">🗑 Hapus</button>
-</div>`
-}
-})
-}
-
-function clearSearch(){
-el("searchInput").value=""
-el("searchResult").innerHTML=""
-}
-
-function editItem(code){
-let item=items.find(x=>x.barcode==code)
-el("formBarang").style.display="block"
-el("barcode").value=item.barcode
-el("nama").value=item.nama
-el("rak").value=item.rak
-el("shelf").value=item.shelf
-el("baris").value=item.baris
-el("stok").value=item.stok
-el("exp").value=item.exp
-el("warning").value=item.warning
-window.scrollTo({top:0,behavior:"smooth"})
-}
-
-function deleteItem(code){
-if(confirm("Yakin hapus?")){
-items=items.filter(x=>x.barcode!=code)
-saveDB()
-refreshAll()
-searchItem()
-}
-}
-
-function startScanner(){
-let scanner=new Html5Qrcode("reader")
-scanner.start({facingMode:"environment"},{fps:10,qrbox:250},
-(code)=>{
-el("barcode").value=code
-scanner.stop()
-el("formBarang").style.display="block"
-let item=items.find(x=>x.barcode==code)
-if(item){
-el("nama").value=item.nama
-el("rak").value=item.rak
-el("shelf").value=item.shelf
-el("baris").value=item.baris
-el("stok").value=item.stok
-el("exp").value=item.exp
-el("warning").value=item.warning
-}
-})
-}
-
-function startSearchScanner(){
-let scanner=new Html5Qrcode("readerSearch")
-scanner.start({facingMode:"environment"},{fps:10,qrbox:250},
-(code)=>{
-scanner.stop()
-let item=items.find(x=>x.barcode==code)
-if(item){
-el("searchResult").innerHTML=`
-<div class="card">
-<b>${item.nama}</b><br>
-Rak ${item.rak} | Shelf ${item.shelf} | Baris ${item.baris}<br>
-Stok ${item.stok}<br>
-Exp ${item.exp}<br><br>
-
-<button onclick="editItem('${item.barcode}')">✏️ Edit</button>
-<button onclick="deleteItem('${item.barcode}')">🗑 Hapus</button>
-</div>`
-}else{
-showToast("Barang tidak ditemukan","error")
-}
-})
-}
-
-function checkExpired(){
-let today=new Date()
-el("warningList").innerHTML=""
-el("expiredList").innerHTML=""
-items.forEach(i=>{
-let diff=Math.ceil((new Date(i.exp)-today)/86400000)
-if(diff<=0){
-el("expiredList").innerHTML+=`
-<div class="card">
-🔴 ${i.nama}
-<br><br>
-<button onclick="updateExp('${i.barcode}')">✔ Tindakan</button>
-</div>`
-}
-else if(diff<=i.warning){
-el("warningList").innerHTML+=`
-<div class="card">
-⚠ ${i.nama} (H-${diff})
-<br><br>
-<button onclick="updateExp('${i.barcode}')">✔ Tindakan</button>
-</div>`
-}
-})
-}
-
-/* ===================== */
-/* TAMBAHAN FITUR TINDAKAN */
-/* ===================== */
-
-let selectedBarcode = null
-
-function updateExp(barcode){
-let item = items.find(x=>x.barcode==barcode)
-
-selectedBarcode = barcode
-
-el("formTindakan").style.display = "block"
-el("t_nama").value = item.nama
-el("t_stok").value = item.stok
-
-el("t_exp").checked = false
-el("t_terjual").checked = false
-el("t_exp").value = item.exp
-el("t_warning").value = item.warning
-}
-
-function tutupTindakan(){
-el("formTindakan").style.display = "none"
-selectedBarcode = null
-}
-
-function simpanTindakan(){
-
-if(!selectedBarcode) return
-
-let item = items.find(x=>x.barcode==selectedBarcode)
-
-let stokBaru = parseInt(el("t_stok").value || 0)
-let expBaru = el("t_exp").value
-let warningBaru = parseInt(el("t_warning").value || item.warning)
-let isExp = el("t_exp").checked
-let isTerjual = el("t_terjual").checked
-
-let status = ""
-
-if(isExp) status = "Expired"
-if(isTerjual) status = "Terjual"
-
-if(!status){
-showToast("Pilih status dulu","error")
-return
-}
-
-/* update stok */
-item.stok = stokBaru
-
-if(expBaru) item.exp = expBaru
-if(warningBaru) item.warning = warningBaru
-saveDB()
-
-/* simpan laporan */
-laporan.push({
-nama: item.nama,
-status: status,
-stok: stokBaru,
-tanggal: new Date().toLocaleDateString()
-})
-
-saveLaporan()
-
-tutupTindakan()
-refreshAll()
-
-showToast("Tindakan berhasil disimpan")
-}
-refreshAll()
-
-</script>
-
+    <header>
+        <h1>ReturHub</h1>
+        <p>Smart Inventory Tracker</p>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('dashboard')">Notif Tarik 🔔</button>
+        <button class="tab-btn" onclick="switchTab('input')">Input Data ✍️</button>
+        <button class="tab-btn" onclick="switchTab('list')">List Semua 📋</button>
+    </div>
+
+    <div class="container">
+
+        <div id="page-dashboard" class="page active">
+            <div class="card">
+                <h2>🚨 Tindakan Segera</h2>
+                <p style="font-size:12px; color:#94a3b8; margin-top:-10px; margin-bottom:20px;">
+                    Barang yang harus segera ditarik dari rak hari ini.
+                </p>
+                
+                <div id="actionList">
+                    </div>
+            </div>
+        </div>
+
+        <div id="page-input" class="page">
+            <div class="card">
+                <h2>📦 Tambah Barang Baru</h2>
+                
+                <div class="form-group">
+                    <label>Nama Produk</label>
+                    <input type="text" id="nama" placeholder="Contoh: Chitato Sapi Panggang 68g">
+                </div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label>Jenis Modis</label>
+                        <input type="text" id="modis" placeholder="Contoh: Snack">
+                    </div>
+                    <div class="form-group">
+                        <label>Stok</label>
+                        <input type="number" id="stok" placeholder="Jml">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label>Shelving</label>
+                        <input type="text" id="shelf" placeholder="Contoh: 3">
+                    </div>
+                    <div class="form-group">
+                        <label>Baris</label>
+                        <input type="text" id="baris" placeholder="Contoh: 1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Tanggal Expired</label>
+                    <input type="date" id="expDate">
+                </div>
+
+                <div class="form-group">
+                    <label>Tarik H- Berapa? (Dalam Hari)</label>
+                    <input type="number" id="tarikDays" placeholder="Contoh: 60 (Untuk 2 Bulan)">
+                </div>
+
+                <button class="btn-primary" onclick="simpanBarang()">Simpan Barang</button>
+            </div>
+        </div>
+
+        <div id="page-list" class="page">
+            <div class="card">
+                <h2>📋 Semua Data Barang</h2>
+                <div id="allList">
+                    </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast">Notifikasi</div>
+
+    <script>
+        // Inisialisasi Database
+        let dbBarang = JSON.parse(localStorage.getItem('returHubDB')) || [];
+
+        // Fungsi Navigasi Tab
+        function switchTab(tabId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('page-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+
+            if(tabId === 'dashboard') renderDashboard();
+            if(tabId === 'list') renderAllList();
+        }
+
+        // Fungsi Toast Notification
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.className = isError ? 'error show' : 'show';
+            setTimeout(() => { toast.className = ''; }, 3000);
+        }
+
+        // Fungsi Simpan Barang
+        function simpanBarang() {
+            const nama = document.getElementById('nama').value;
+            const modis = document.getElementById('modis').value;
+            const shelf = document.getElementById('shelf').value;
+            const baris = document.getElementById('baris').value;
+            const stok = document.getElementById('stok').value;
+            const expDate = document.getElementById('expDate').value;
+            const tarikDays = document.getElementById('tarikDays').value;
+
+            if(!nama || !modis || !shelf || !baris || !expDate || !tarikDays) {
+                showToast("Semua kolom wajib diisi, bro!", true);
+                return;
+            }
+
+            const item = {
+                id: Date.now().toString(),
+                nama, modis, shelf, baris, stok, expDate, tarikDays: parseInt(tarikDays)
+            };
+
+            dbBarang.push(item);
+            localStorage.setItem('returHubDB', JSON.stringify(dbBarang));
+
+            // Reset Form
+            ['nama','modis','shelf','baris','stok','expDate','tarikDays'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+
+            showToast("Mantap! Data berhasil disimpan.");
+            renderDashboard();
+        }
+
+        // Fungsi Hapus Barang (Jika sudah ditarik/terjual habis)
+        function hapusBarang(id) {
+            if(confirm('Udah beres ditarik? Yakin mau hapus data ini?')) {
+                dbBarang = dbBarang.filter(item => item.id !== id);
+                localStorage.setItem('returHubDB', JSON.stringify(dbBarang));
+                renderDashboard();
+                renderAllList();
+                showToast("Data berhasil dihapus.");
+            }
+        }
+
+        // Format Tanggal Indo (Cth: 30 Apr 2026)
+        function formatTanggal(tglString) {
+            const d = new Date(tglString);
+            return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        // Hitung Selisih Hari dari Hari Ini
+        function hitungSelisihHari(tglTujuan) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const target = new Date(tglTujuan);
+            target.setHours(0,0,0,0);
+            const diffTime = target - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        // Render Data Dashboard (Hanya Warning & Expired)
+        function renderDashboard() {
+            const listContainer = document.getElementById('actionList');
+            listContainer.innerHTML = '';
+
+            if(dbBarang.length === 0) {
+                listContainer.innerHTML = `<div class="empty-state">📦<br>Belum ada data barang nih.</div>`;
+                return;
+            }
+
+            // Urutkan berdasarkan tanggal expired paling dekat
+            let sortedDB = [...dbBarang].sort((a,b) => new Date(a.expDate) - new Date(b.expDate));
+            let adaNotif = false;
+
+            sortedDB.forEach(item => {
+                const hariMenujuExp = hitungSelisihHari(item.expDate);
+                const hariHarusDitarik = item.tarikDays;
+                
+                let statusClass = '';
+                let statusText = '';
+                let showCard = false;
+
+                if (hariMenujuExp < 0) {
+                    // SUDAH LEWAT EXPIRED
+                    statusClass = 'alert-danger';
+                    statusText = '🔴 KADALUARSA! Buang Sekarang';
+                    showCard = true;
+                } else if (hariMenujuExp <= hariHarusDitarik) {
+                    // HARI H PENARIKAN (Atau sudah lewat hari penarikan tapi belum expired)
+                    statusClass = 'alert-warning';
+                    statusText = `🟡 TARIK! (Lewat batas H-${hariHarusDitarik})`;
+                    showCard = true;
+                }
+
+                if(showCard) {
+                    adaNotif = true;
+                    listContainer.innerHTML += `
+                        <div class="alert-card ${statusClass}">
+                            <div class="item-name">${item.nama} <span class="badge" style="font-size:11px; float:right;">${statusText}</span></div>
+                            <div class="item-location">
+                                📍 Modis: ${item.modis} | Shelf: ${item.shelf} | Baris: ${item.baris}
+                            </div>
+                            <div class="item-details">
+                                <span>Exp: <b>${formatTanggal(item.expDate)}</b> (Sisa ${hariMenujuExp} Hari)</span>
+                                <span>Stok: ${item.stok}</span>
+                            </div>
+                            <button class="btn-action" onclick="hapusBarang('${item.id}')">Tandai Selesai & Hapus</button>
+                        </div>
+                    `;
+                }
+            });
+
+            if(!adaNotif) {
+                listContainer.innerHTML = `<div class="empty-state">✨<br>Aman bro! Nggak ada barang yang perlu ditarik.</div>`;
+            }
+        }
+
+        // Render Semua List
+        function renderAllList() {
+            const listContainer = document.getElementById('allList');
+            listContainer.innerHTML = '';
+
+            if(dbBarang.length === 0) {
+                listContainer.innerHTML = `<div class="empty-state">📦<br>Data kosong.</div>`;
+                return;
+            }
+
+            dbBarang.forEach(item => {
+                const hariMenujuExp = hitungSelisihHari(item.expDate);
+                let badge = (hariMenujuExp <= item.tarikDays) ? '⚠️ Segera Tarik' : '✅ Aman';
+                if(hariMenujuExp < 0) badge = '❌ Expired';
+
+                listContainer.innerHTML += `
+                    <div class="alert-card alert-safe" style="border-color:#334155; background:#0f172a;">
+                        <div class="item-name">${item.nama} <span style="font-size:11px; float:right;">${badge}</span></div>
+                        <div class="item-location" style="background:#1e293b;">
+                            📍 Modis: ${item.modis} | S: ${item.shelf} | B: ${item.baris}
+                        </div>
+                        <div class="item-details">
+                            <span>Exp: ${formatTanggal(item.expDate)}</span>
+                            <span>Aturan Tarik: H-${item.tarikDays}</span>
+                        </div>
+                        <button class="btn-action" style="background:#dc2626;" onclick="hapusBarang('${item.id}')">Hapus Data</button>
+                    </div>
+                `;
+            });
+        }
+
+        // Run on load
+        renderDashboard();
+    </script>
 </body>
 </html>
+

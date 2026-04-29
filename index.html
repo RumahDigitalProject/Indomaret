@@ -41,7 +41,7 @@
         .nav-tabs { display: flex; justify-content: center; gap: 8px; padding: 15px; }
         .tab-btn {
             flex: 1; background: #1e293b; color: #94a3b8; border: 1px solid #334155;
-            padding: 10px; border-radius: 10px; font-weight: 600; font-size: 12px; cursor: pointer;
+            padding: 10px; border-radius: 10px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s;
         }
         .tab-btn.active { background: rgba(37, 99, 235, 0.15); color: #3b82f6; border-color: #3b82f6; }
 
@@ -65,32 +65,57 @@
         .input-row { display: flex; gap: 10px; }
         .input-row .form-group { flex: 1; }
 
-        /* BUTTONS */
-        .btn-primary {
-            width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;
-            border: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 5px; cursor: pointer;
+        /* TOGGLE MODE INPUT TANGGAL VS BARU */
+        .mode-toggle-box {
+            display: flex; background: #0f172a; border-radius: 10px; padding: 4px; margin-bottom: 15px; border: 1px solid #334155;
         }
-        .btn-action {
-            background: #3b82f6; border: none; color: white; padding: 6px 10px;
-            border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;
+        .mode-btn {
+            flex: 1; background: transparent; border: none; color: #94a3b8; padding: 10px; 
+            border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Poppins';
         }
-        .btn-danger {
-            background: #dc2626; border: none; color: white; padding: 10px; width: 100%;
-            border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 10px; cursor: pointer;
-        }
+        .mode-btn.active { background: #3b82f6; color: white; box-shadow: 0 2px 8px rgba(59,130,246,0.4); }
 
-        /* FILTER BOX & SEARCH BAR */
-        .filter-container { display: flex; gap: 8px; margin-bottom: 10px; }
-        .filter-container select { flex: 1; padding: 8px; font-size: 12px; }
-        .search-box { position: relative; margin-bottom: 15px; }
-        .search-box input { padding-left: 35px; border-color: #3b82f6; }
-        .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 16px; }
+        /* CUSTOM DROPDOWN MODIS & SHELF */
+        .custom-dropdown {
+            position: absolute; top: 100%; left: 0; width: 100%; background: #1e293b; 
+            border: 1px solid #3b82f6; border-radius: 8px; margin-top: 4px; z-index: 50; 
+            padding: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 8px;
+        }
+        .modis-item {
+            display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px 12px; border-radius: 6px; cursor: pointer; border: 1px solid #334155;
+        }
+        .modis-item:active { background: #1e3a8a; }
+        .modis-item span { flex: 1; font-size: 13px; font-weight: 600; color: #f8fafc; }
+        
+        .btn-pin { background: transparent; border: none; font-size: 16px; cursor: pointer; filter: grayscale(100%) opacity(0.5); transition: 0.2s; padding: 0 5px; }
+        .btn-pin.active { filter: grayscale(0%) opacity(1); transform: scale(1.2); }
+        .btn-del-item { background: transparent; border: none; color: #fca5a5; font-size: 12px; cursor: pointer; padding: 0 5px; }
+        
+        .add-modis-row { display: flex; gap: 6px; margin-top: 5px; border-top: 1px dashed #475569; padding-top: 10px; }
+        .add-modis-row input { flex: 1; padding: 10px; font-size: 12px; border-color: #475569; }
+        .add-modis-row button { background: #10b981; color: white; border: none; border-radius: 8px; width: 45px; font-weight: bold; font-size: 18px; cursor: pointer; box-shadow: 0 2px 6px rgba(16,185,129,0.3); }
+
+        /* GRID SHELFING DINAMIS */
+        .shelf-btn { flex: 1; background: #0f172a; border: 1px solid #334155; color: #f8fafc; border-radius: 8px; padding: 10px 0; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: 0.1s; }
+        .shelf-btn:active { background: #1e3a8a; }
+        .shelf-btn.active { background: #2563eb; border-color: #60a5fa; color: white; transform: scale(1.05); }
+        .shelf-btn.zero { background: rgba(220, 38, 38, 0.15); border-color: rgba(220, 38, 38, 0.5); color: #fca5a5; padding: 12px; border-radius: 8px; margin-bottom: 4px; width: 100%; font-size: 12px; }
+        .shelf-btn.zero:active { background: #dc2626; color: white; }
+
+        /* BUTTONS */
+        .btn-primary { width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 5px; cursor: pointer; }
+        .btn-action { background: #3b82f6; border: none; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+        .btn-danger { background: #dc2626; border: none; color: white; padding: 10px; width: 100%; border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 10px; cursor: pointer; }
+
+        /* DASHBOARD MONTH SCROLL */
+        .month-scroll-container {
+            display: flex; overflow-x: auto; gap: 8px; padding-bottom: 8px; margin-bottom: 15px; border-bottom: 1px solid #334155;
+            -ms-overflow-style: none; scrollbar-width: none; /* Hide scrollbar */
+        }
+        .month-scroll-container::-webkit-scrollbar { display: none; }
 
         /* KARTU LIST DATA */
-        .compact-card {
-            background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px;
-            margin-bottom: 10px; position: relative; border-left: 4px solid #3b82f6;
-        }
+        .compact-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px; margin-bottom: 10px; position: relative; border-left: 4px solid #3b82f6; }
         .compact-card.danger { border-left-color: #dc2626; background: rgba(220, 38, 38, 0.05); }
         .compact-card.warning { border-left-color: #eab308; background: rgba(234, 179, 8, 0.05); }
 
@@ -100,16 +125,12 @@
         .badge.safe { background: #064e3b; color: #34d399; }
         .badge.warn { background: #713f12; color: #fde047; }
         .badge.dang { background: #7f1d1d; color: #fca5a5; }
-
         .c-body { font-size: 11px; color: #94a3b8; display: flex; flex-direction: column; gap: 4px; }
-        .c-row { display: flex; justify-content: space-between; }
+        .c-row { display: flex; justify-content: space-between; align-items: flex-end;}
         .highlight { color: #60a5fa; font-weight: 600; }
 
         /* MODAL FULL EDIT */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(5px); align-items: center; justify-content: center;
-        }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(5px); align-items: center; justify-content: center; }
         .modal-overlay.active { display: flex; }
         .modal-content { background: #1e293b; width: 95%; max-width: 380px; padding: 20px; border-radius: 16px; border: 1px solid #3b82f6; max-height: 90vh; overflow-y: auto; }
         .btn-close-modal { background: transparent; color: #94a3b8; border: 1px solid #475569; width: 100%; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight:600; cursor: pointer;}
@@ -118,16 +139,12 @@
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #10b981; color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: 600; transition: 0.3s; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         #toast.show { transform: translateX(-50%) translateY(0); }
         .empty-state { text-align: center; padding: 20px; color: #64748b; font-size: 13px; }
-        
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="syncBanner">
-        <div class="mini-spinner"></div>
-        <span id="syncText">Menyinkronkan...</span>
-    </div>
+    <div id="syncBanner"><div class="mini-spinner"></div><span id="syncText">Menyinkronkan...</span></div>
 
     <header>
         <h1>ReturHub</h1>
@@ -143,50 +160,122 @@
     <div class="container">
         <div id="page-dashboard" class="page active">
             <div class="card">
-                <h2>🚨 Butuh Tindakan Segera</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                    <h2 style="margin:0;">🚨 Jadwal Tarik Barang</h2>
+                    <span class="badge warn" style="font-size:12px; padding:4px 8px;" id="dashTotalBadge">Total: 0</span>
+                </div>
+                
+                <div id="dashMonthFilters" class="month-scroll-container">
+                    </div>
+
                 <div id="actionList"></div>
             </div>
         </div>
 
         <div id="page-input" class="page">
             <div class="card">
-                <h2>📦 Tambah Barang Baru</h2>
-                <div class="form-group"><label>Nama Produk</label><input type="text" id="nama" placeholder="Contoh: Chitato Sapi Panggang"></div>
-                <datalist id="modisHistory"></datalist>
-                <div class="form-group"><label>Jenis Modis</label><input type="text" id="modis" list="modisHistory" placeholder="Ketik/Pilih Modis"></div>
-                <div class="input-row">
-                    <div class="form-group"><label>Shelving (No Rak)</label><input type="number" id="shelf" placeholder="Contoh: 3"></div>
-                    <div class="form-group"><label>Baris</label><input type="number" id="baris" placeholder="Contoh: 1"></div>
+                
+                <div class="mode-toggle-box">
+                    <button id="btnModeBaru" class="mode-btn active" onclick="switchInputMode('baru')">📦 Input Data Baru</button>
+                    <button id="btnModeTgl" class="mode-btn" onclick="switchInputMode('tgl')">⏳ Input Tgl Kadaluarsa</button>
                 </div>
-                <div class="input-row">
-                    <div class="form-group"><label>Tgl Expired</label><input type="date" id="expDate"></div>
-                    <div class="form-group"><label>Tarik H- (Hari)</label><input type="number" id="tarikDays" placeholder="Contoh: 60"></div>
+
+                <div class="mode-baru-only" style="text-align: right; margin-bottom: 10px;">
+                    <button class="btn-action" style="background:#8b5cf6;" onclick="toggleImportAI()">🤖 Import Data dari AI</button>
                 </div>
-                <button class="btn-primary" onclick="simpanBarang()">Simpan Data</button>
+                <div id="boxImportAI" class="mode-baru-only" style="display:none; background:#0f172a; padding:15px; border-radius:10px; border:1px solid #8b5cf6; margin-bottom:15px;">
+                    <label style="color:#c4b5fd;">Paste Kode Magic dari AI di sini:</label>
+                    <textarea id="kodeAI" style="width:100%; height:80px; background:#1e293b; color:#f8fafc; border:1px solid #4c1d95; border-radius:8px; padding:8px; font-size:11px; font-family:monospace; margin-bottom:10px;"></textarea>
+                    <button class="btn-primary" style="background:linear-gradient(135deg, #7c3aed, #6d28d9);" onclick="prosesImportAI()">🚀 Eksekusi Import</button>
+                </div>
+
+                <div class="form-group mode-baru-only">
+                    <label>Nama Produk</label>
+                    <input type="text" id="nama" placeholder="Contoh: CHITATO SAPI PANGGANG" oninput="this.value = this.value.toUpperCase()">
+                </div>
+                
+                <div class="form-group" style="position: relative;">
+                    <label>Jenis Modis</label>
+                    <input type="text" id="modis" placeholder="Pilih Modis & Kunci 📌" readonly onclick="toggleModisDropdown()">
+                    <div id="modisDropdown" class="custom-dropdown">
+                        <div id="modisListContainer" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;"></div>
+                        <div class="add-modis-row">
+                            <input type="text" id="newModisInput" placeholder="Ketik modis baru..." style="margin-bottom:0;" oninput="this.value = this.value.toUpperCase()">
+                            <button type="button" onclick="tambahModisBaru()">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="form-group" style="position: relative;">
+                        <label>Shelving (No Rak)</label>
+                        <input type="text" id="shelf" placeholder="Pilih Rak 📌" readonly onclick="toggleShelfDropdown()">
+                        <div id="shelfDropdown" class="custom-dropdown" style="min-width: 290px; left: 0; padding: 12px; z-index: 60;">
+                            <div id="shelfDropdownContainer">
+                                </div>
+                            <div class="add-modis-row" style="margin-top: 10px;">
+                                <input type="text" id="newShelfInput" placeholder="Rak kustom (misal: 1A)" style="margin-bottom:0;" oninput="this.value = this.value.toUpperCase()">
+                                <button type="button" onclick="tambahShelfBaru()">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mode-baru-only"><label>Baris</label><input type="number" id="baris" placeholder="Contoh: 1"></div>
+                </div>
+
+                <div class="input-row mode-baru-only">
+                    <div class="form-group"><label>Tgl Expired <span style="color:#64748b">(Opsional)</span></label><input type="date" id="expDate"></div>
+                    <div class="form-group"><label>Tarik H- <span style="color:#64748b">(Opsional)</span></label><input type="number" id="tarikDays" placeholder="Contoh: 60"></div>
+                </div>
+                
+                <button class="btn-primary mode-baru-only" onclick="simpanBarang()">Simpan Data</button>
+
+                <div class="mode-tgl-only" style="display:none; margin-top:20px; border-top:1px dashed #334155; padding-top:15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                        <h3 style="font-size:14px; margin:0; color:#cbd5e1;">📋 Menunggu Input Expired</h3>
+                        <span class="badge warn" style="font-size:12px; padding:4px 8px;" id="totalIncompleteBadge">Total: 0</span>
+                    </div>
+                    <p style="font-size:11px; color:#64748b; margin-top:0; margin-bottom:15px;">Pilih Modis & Shelving di atas untuk filter data.</p>
+                    <div id="incompleteItemsList"></div>
+                </div>
             </div>
         </div>
 
         <div id="page-list" class="page">
             <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h2>🔍 Letak Barang</h2>
-                    <button class="btn-action" style="background:#059669; padding:8px 12px; margin-top:0;" onclick="tarikDataGoogleSheet()">🔄 Refresh Web</button>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h2 style="margin:0;">🔍 Letak Barang</h2>
+                    <button class="btn-action" style="background:#059669; padding:8px 12px; margin:0;" onclick="tarikDataGoogleSheet()">🔄 Refresh Web</button>
                 </div>
-                <div class="search-box">
-                    <span class="search-icon">🔎</span>
-                    <input type="text" id="searchInput" placeholder="Ketik nama produk..." onkeyup="terapkanFilter()">
-                </div>
-                <div class="filter-container">
-                    <select id="filterModis" onchange="updateFilterShelf()"><option value="">Semua Modis</option></select>
-                    <select id="filterShelf" onchange="terapkanFilter()"><option value="">Semua Shelving</option></select>
-                </div>
-                <div id="allList"></div>
-            </div>
 
-            <div class="card" style="border-color: #dc2626; background: rgba(220, 38, 38, 0.05); text-align: center; margin-top: 30px;">
-                <h3 style="color: #fca5a5; margin-top: 0; font-size: 14px;">⚠️ Zona Bahaya</h3>
-                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 15px;">Gunakan tombol ini jika ingin menghapus seluruh data barang untuk memulai dari nol.</p>
-                <button class="btn-danger" style="margin-top: 0;" onclick="resetSemuaData()">🚨 Reset Semua Data</button>
+                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <div style="flex: 1; background: #0f172a; border: 1px solid #3b82f6; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <span style="font-size: 11px; color: #94a3b8; margin-bottom: 2px;">Total Filter</span>
+                        <span style="font-size: 20px; font-weight: bold; color: #60a5fa; line-height: 1;" id="totalBarang">0</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+                        <button class="btn-action" style="background:#d97706; margin:0; padding:8px; font-size:11px;" onclick="autoFixDobel()">🧹 Gabung Dobel</button>
+                        <button class="btn-action" style="background:#dc2626; margin:0; padding:8px; font-size:11px;" onclick="resetSemuaData()">🚨 Reset Data</button>
+                    </div>
+                </div>
+
+                <div class="search-box"><span class="search-icon">🔎</span><input type="text" id="searchInput" placeholder="Ketik nama produk..." onkeyup="terapkanFilter()"></div>
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <select id="filterModis" style="flex:1; padding:8px; font-size:12px;" onchange="updateFilterShelf()"><option value="">Semua Modis</option></select>
+                    <select id="filterShelf" style="flex:1; padding:8px; font-size:12px;" onchange="terapkanFilter()"><option value="">Semua Shelving</option></select>
+                </div>
+
+                <div id="btnTutupDataTop" style="display:none; margin-bottom:10px;">
+                    <button class="btn-action" style="background:#475569; width:100%; padding: 10px; font-size:12px;" onclick="toggleExpandList(false)">⬆️ Tutup Data (Tampilkan 5 Terbaru)</button>
+                </div>
+
+                <div id="allList"></div>
+
+                <div id="btnLihatSemuaBottom" style="display:none; margin-top:10px;">
+                    <button class="btn-action" style="background:#3b82f6; width:100%; padding: 10px; font-size:12px;" onclick="toggleExpandList(true)">⬇️ Lihat Semua Data</button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -194,41 +283,18 @@
     <div id="modalTindakan" class="modal-overlay">
         <div class="modal-content">
             <h2 style="margin-bottom: 20px;">✏️ Edit Data Barang</h2>
-            
             <input type="hidden" id="editId">
-            
-            <div class="form-group">
-                <label>Nama Produk</label>
-                <input type="text" id="editNama">
-            </div>
-            
-            <div class="form-group">
-                <label>Jenis Modis</label>
-                <input type="text" id="editModis" list="modisHistory">
-            </div>
-            
+            <div class="form-group"><label>Nama Produk</label><input type="text" id="editNama" oninput="this.value = this.value.toUpperCase()"></div>
+            <datalist id="modisHistory"></datalist>
+            <div class="form-group"><label>Jenis Modis</label><input type="text" id="editModis" list="modisHistory"></div>
             <div class="input-row">
-                <div class="form-group">
-                    <label>Shelving</label>
-                    <input type="number" id="editShelf">
-                </div>
-                <div class="form-group">
-                    <label>Baris</label>
-                    <input type="number" id="editBaris">
-                </div>
+                <div class="form-group"><label>Shelving</label><input type="text" id="editShelf" oninput="this.value = this.value.toUpperCase()"></div>
+                <div class="form-group"><label>Baris</label><input type="number" id="editBaris"></div>
             </div>
-
             <div class="input-row">
-                <div class="form-group">
-                    <label>Tanggal Expired</label>
-                    <input type="date" id="editExpDate">
-                </div>
-                <div class="form-group">
-                    <label>Masa Tarik H-</label>
-                    <input type="number" id="editTarikDays">
-                </div>
+                <div class="form-group"><label>Tanggal Expired</label><input type="date" id="editExpDate"></div>
+                <div class="form-group"><label>Masa Tarik H-</label><input type="number" id="editTarikDays"></div>
             </div>
-            
             <button class="btn-primary" onclick="simpanTindakan()">💾 Simpan Pembaruan</button>
             <button class="btn-danger" onclick="hapusBarangDariSistem()">🗑️ Hapus Permanen Barang Ini</button>
             <button class="btn-close-modal" onclick="tutupModal()">Batal</button>
@@ -241,38 +307,269 @@
         const URL_GOOGLE_SHEET = 'https://script.google.com/macros/s/AKfycbwA3uvzmYyjttATknVVWk8dzkCu3se9byGBkZ6h93ZaJhYquPG_8zHyNI6rpkLDYc-v/exec';
         
         let dbBarang = JSON.parse(localStorage.getItem('returHubCache')) || [];
+        let customModisList = JSON.parse(localStorage.getItem('returHubModisList')) || [];
+        let pinnedModis = ""; 
+        let customShelfList = JSON.parse(localStorage.getItem('returHubShelfList')) || [];
+        let pinnedShelf = ""; 
+        let currentInputMode = 'baru'; 
+        
+        let isExpandedView = false;
+        let currentDashFilter = 'segera'; // State untuk filter bulan di Dashboard
 
-        window.onload = () => {
-            initApp(); 
-            tarikDataGoogleSheet();
-        };
+        window.onload = () => { initApp(); tarikDataGoogleSheet(); };
+
+        document.addEventListener('click', function(e) {
+            const modisInput = document.getElementById('modis'), modisDropdown = document.getElementById('modisDropdown');
+            if (e.target !== modisInput && !modisDropdown.contains(e.target)) modisDropdown.style.display = 'none';
+            const shelfInput = document.getElementById('shelf'), shelfDropdown = document.getElementById('shelfDropdown');
+            if (e.target !== shelfInput && !shelfDropdown.contains(e.target)) shelfDropdown.style.display = 'none';
+        });
+
+        // --- FITUR IMPORT AI ---
+        function toggleImportAI() {
+            const box = document.getElementById('boxImportAI');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function prosesImportAI() {
+            try {
+                const rawData = document.getElementById('kodeAI').value;
+                const dataAI = JSON.parse(rawData);
+                if(!Array.isArray(dataAI)) throw new Error("Format salah");
+
+                let countBerhasil = 0; let countDiupdate = 0;
+
+                dataAI.forEach(item => {
+                    let indexAda = dbBarang.findIndex(b => b.modis === item.modis && String(b.shelf) === String(item.shelf) && b.baris === parseInt(item.baris));
+                    if(indexAda !== -1) {
+                        dbBarang[indexAda].nama = item.nama.toUpperCase();
+                        countDiupdate++;
+                    } else {
+                        dbBarang.push({
+                            id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                            nama: item.nama.toUpperCase(), modis: item.modis, shelf: item.shelf.toString(), 
+                            baris: parseInt(item.baris), expDate: "", tarikDays: item.tarikDays || 60 
+                        });
+                        countBerhasil++;
+                    }
+                });
+
+                document.getElementById('kodeAI').value = '';
+                toggleImportAI(); initApp(); pushDataKeGoogleSheet();
+                showToast(`Selesai! ${countBerhasil} Baru, ${countDiupdate} Diperbarui namanya 🚀`);
+            } catch(e) { alert("Gagal Import! Pastikan kode JSON yang dimasukkan benar."); }
+        }
+
+        function autoFixDobel() {
+            if(!confirm("Fitur ini akan menyatukan barang yang dobel di letak Rak & Baris yang sama.\n\nNama lama akan diganti nama resmi, TAPI tanggal expired lama akan dipertahankan.\n\nLanjutkan?")) return;
+            
+            let lokasiMap = {}; let countDigabung = 0;
+            let sortedDB = [...dbBarang].sort((a, b) => {
+                let aExp = (a.expDate && a.expDate !== "") ? 1 : 0;
+                let bExp = (b.expDate && b.expDate !== "") ? 1 : 0;
+                return bExp - aExp; 
+            });
+
+            sortedDB.forEach(item => {
+                let key = `${item.modis}_${item.shelf}_${item.baris}`;
+                if (!lokasiMap[key]) {
+                    lokasiMap[key] = { ...item };
+                } else {
+                    countDigabung++;
+                    if(item.nama.length > 3) lokasiMap[key].nama = item.nama.toUpperCase();
+                    if(item.tarikDays && !lokasiMap[key].tarikDays) lokasiMap[key].tarikDays = item.tarikDays;
+                }
+            });
+
+            dbBarang = Object.values(lokasiMap);
+            initApp(); pushDataKeGoogleSheet();
+            showToast(`Sapu Bersih Selesai! ${countDigabung} data dobel digabungkan.`);
+        }
+
+        function resetSemuaData() {
+            if (confirm("🚨 PERINGATAN BAHAYA 🚨\n\nApakah kamu YAKIN ingin MENGHAPUS SEMUA DATA BARANG?")) {
+                if (confirm("TINDAKAN INI TIDAK BISA DIBATALKAN!\n\nLanjutkan?")) {
+                    dbBarang = []; initApp(); showToast("Sapu jagat berhasil!"); pushDataKeGoogleSheet(); 
+                }
+            }
+        }
+
+        function switchInputMode(mode) {
+            currentInputMode = mode;
+            const elsBaru = document.querySelectorAll('.mode-baru-only');
+            const elsTgl = document.querySelectorAll('.mode-tgl-only');
+
+            if(mode === 'baru') {
+                document.getElementById('btnModeBaru').classList.add('active'); document.getElementById('btnModeTgl').classList.remove('active');
+                elsBaru.forEach(el => el.style.display = ''); elsTgl.forEach(el => el.style.display = 'none');
+            } else {
+                document.getElementById('btnModeTgl').classList.add('active'); document.getElementById('btnModeBaru').classList.remove('active');
+                elsBaru.forEach(el => el.style.display = 'none'); elsTgl.forEach(el => el.style.display = '');
+                renderIncompleteItems();
+            }
+        }
+
+        function syncModisList() {
+            let dbModis = [...new Set(dbBarang.map(i => i.modis))];
+            dbModis.forEach(m => { if(!customModisList.includes(m) && m) customModisList.push(m); });
+            localStorage.setItem('returHubModisList', JSON.stringify(customModisList));
+        }
+
+        function toggleModisDropdown() {
+            const dd = document.getElementById('modisDropdown');
+            if(dd.style.display === 'flex') dd.style.display = 'none';
+            else { syncModisList(); renderModisDropdown(); dd.style.display = 'flex'; }
+        }
+
+        function renderModisDropdown() {
+            const container = document.getElementById('modisListContainer'); let htmlStr = '';
+            if(customModisList.length === 0) htmlStr = '<span style="font-size:11px; color:#94a3b8;">Belum ada modis.</span>';
+            else {
+                customModisList.forEach(m => {
+                    let isActive = (pinnedModis === m) ? 'active' : '', pinIcon = (pinnedModis === m) ? '📌' : '📍'; 
+                    htmlStr += `<div class="modis-item"><span onclick="pilihModis('${m}')">${m}</span><div style="display:flex; gap:6px;"><button type="button" class="btn-pin ${isActive}" onclick="setPinModis('${m}', event)">${pinIcon}</button><button type="button" class="btn-del-item" onclick="hapusModisPilihan('${m}', event)">❌</button></div></div>`;
+                });
+            }
+            container.innerHTML = htmlStr;
+        }
+
+        function pilihModis(nama) {
+            document.getElementById('modis').value = nama; document.getElementById('modisDropdown').style.display = 'none';
+            
+            // JIKA PINNED SHELF TIDAK ADA DI MODIS BARU INI, LEPAS KUNCIAN SHELF
+            if(pinnedShelf !== "") {
+                let rakAda = dbBarang.some(b => b.modis === nama && String(b.shelf) === pinnedShelf);
+                if(!rakAda) {
+                    pinnedShelf = ""; document.getElementById('shelf').value = "";
+                    showToast("Kunci rak dilepas karena tidak cocok dengan modis ini.");
+                }
+            }
+            
+            if(currentInputMode === 'tgl') renderIncompleteItems();
+        }
+
+        function setPinModis(nama, event) {
+            event.stopPropagation();
+            if(pinnedModis === nama) { pinnedModis = ""; showToast("Pin Modis Dilepas!"); } 
+            else { pinnedModis = nama; showToast(`Modis ${nama} Terkunci 📌`); }
+            renderModisDropdown(); pilihModis(nama);
+        }
+
+        function tambahModisBaru() {
+            const val = document.getElementById('newModisInput').value.trim().toUpperCase();
+            if(!val) return;
+            if(!customModisList.includes(val)) {
+                customModisList.push(val); localStorage.setItem('returHubModisList', JSON.stringify(customModisList)); updateModisDatalist();
+            }
+            document.getElementById('newModisInput').value = ''; renderModisDropdown();
+        }
+
+        function hapusModisPilihan(nama, event) {
+            event.stopPropagation();
+            if(confirm(`Yakin ingin menghapus jenis modis "${nama}"?`)) {
+                customModisList = customModisList.filter(m => m !== nama);
+                localStorage.setItem('returHubModisList', JSON.stringify(customModisList));
+                if(pinnedModis === nama) { pinnedModis = ""; document.getElementById('modis').value = ''; }
+                renderModisDropdown();
+            }
+        }
+
+        // --- GRID SHELFING DINAMIS ---
+        function toggleShelfDropdown() {
+            const dd = document.getElementById('shelfDropdown');
+            if(dd.style.display === 'flex') dd.style.display = 'none';
+            else { renderShelfGrid(); dd.style.display = 'flex'; }
+        }
+
+        function renderShelfGrid() {
+            const container = document.getElementById('shelfDropdownContainer');
+            let htmlStr = '<button type="button" class="shelf-btn zero" onclick="pilihShelf(\'\')">0 (Kosongkan Rak / Lepas Kunci)</button>';
+            
+            const curModis = document.getElementById('modis').value;
+            let filteredDB = curModis ? dbBarang.filter(b => b.modis === curModis) : dbBarang;
+            let unikShelf = [...new Set(filteredDB.map(b => String(b.shelf)))];
+            
+            customShelfList.forEach(s => { if(!unikShelf.includes(String(s))) unikShelf.push(String(s)); });
+            unikShelf = unikShelf.filter(s => s.trim() !== "" && s !== "undefined");
+
+            unikShelf.sort((a, b) => {
+                let numA = parseInt(a), numB = parseInt(b);
+                if(!isNaN(numA) && !isNaN(numB) && numA !== numB) return numA - numB;
+                return a.localeCompare(b);
+            });
+
+            if(unikShelf.length > 0) {
+                htmlStr += '<div style="display:grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top:6px;">';
+                unikShelf.forEach(s => {
+                    let activeCls = (pinnedShelf == s) ? 'active' : '';
+                    htmlStr += `<button type="button" class="shelf-btn ${activeCls}" onclick="pilihShelf('${s}')">${s}</button>`;
+                });
+                htmlStr += '</div>';
+            } else {
+                htmlStr += '<div style="font-size:11px; color:#94a3b8; text-align:center; padding:10px;">Belum ada rak tercatat untuk modis ini.</div>';
+            }
+
+            let adaCustom = false; let hapusCustomHTML = '';
+            customShelfList.forEach(s => {
+                if(s) {
+                    if(!adaCustom) {
+                        hapusCustomHTML += '<div style="margin-top:10px; border-top:1px dashed #475569; padding-top:10px; font-size:11px; color:#cbd5e1;">Hapus Rak Kustom (Manual):</div><div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">';
+                        adaCustom = true;
+                    }
+                    hapusCustomHTML += `
+                        <div style="display:flex; align-items:stretch; background:#0f172a; border:1px solid #334155; border-radius:6px; overflow:hidden;">
+                            <div style="padding:8px 14px; font-size:13px; color:#f8fafc; font-weight:600; display:flex; align-items:center;">${s}</div>
+                            <button type="button" style="background:rgba(220, 38, 38, 0.2); border:none; color:#fca5a5; padding:0 10px; cursor:pointer;" onclick="hapusShelfPilihan('${s}', event)">❌</button>
+                        </div>
+                    `;
+                }
+            });
+            if(adaCustom) hapusCustomHTML += '</div>';
+            htmlStr += hapusCustomHTML;
+
+            container.innerHTML = htmlStr;
+        }
+
+        function pilihShelf(val) {
+            pinnedShelf = val; document.getElementById('shelf').value = val;
+            document.getElementById('shelfDropdown').style.display = 'none';
+            if(val === "") showToast("Kunci Shelving Dilepas!"); else showToast(`Shelving ${val} Terkunci 📌`);
+            if(currentInputMode === 'tgl') renderIncompleteItems();
+        }
+
+        function tambahShelfBaru() {
+            const val = document.getElementById('newShelfInput').value.trim().toUpperCase();
+            if(!val) return;
+            if(!customShelfList.includes(val)) { customShelfList.push(val); localStorage.setItem('returHubShelfList', JSON.stringify(customShelfList)); }
+            document.getElementById('newShelfInput').value = ''; renderShelfGrid();
+        }
+
+        function hapusShelfPilihan(nama, event) {
+            event.stopPropagation();
+            if(confirm(`Yakin ingin menghapus rak kustom "${nama}"?`)) {
+                customShelfList = customShelfList.filter(s => s !== nama);
+                localStorage.setItem('returHubShelfList', JSON.stringify(customShelfList));
+                if(pinnedShelf === nama) { pinnedShelf = ""; document.getElementById('shelf').value = ''; }
+                renderShelfGrid();
+            }
+        }
 
         let syncTimeout;
         function setSyncStatus(isSyncing, text = "Menyinkronkan...") {
-            const banner = document.getElementById('syncBanner');
-            document.getElementById('syncText').innerText = text;
+            const banner = document.getElementById('syncBanner'); document.getElementById('syncText').innerText = text;
             clearTimeout(syncTimeout);
-
-            if (isSyncing) {
-                banner.classList.add('show');
-            } else {
-                syncTimeout = setTimeout(() => { banner.classList.remove('show'); }, 1500);
-            }
+            if (isSyncing) banner.classList.add('show'); else syncTimeout = setTimeout(() => { banner.classList.remove('show'); }, 1500);
         }
 
         async function tarikDataGoogleSheet() {
             setSyncStatus(true, "Mengunduh pembaruan dari awan...");
             try {
                 const response = await fetch(URL_GOOGLE_SHEET);
-                dbBarang = await response.json();
-                localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
-                initApp(); 
-                terapkanFilter(); 
+                dbBarang = await response.json(); localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
+                syncModisList(); initApp();
+                if(currentInputMode === 'tgl') renderIncompleteItems();
                 setSyncStatus(false, "Sinkronisasi selesai! ✅");
-            } catch (error) {
-                console.error(error);
-                setSyncStatus(false, "Mode Offline Aktif ⚠");
-            }
+            } catch (error) { setSyncStatus(false, "Mode Offline Aktif ⚠"); }
         }
 
         async function pushDataKeGoogleSheet() {
@@ -281,244 +578,322 @@
                 localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
                 await fetch(URL_GOOGLE_SHEET, { method: 'POST', body: JSON.stringify(dbBarang) });
                 setSyncStatus(false, "Tersimpan aman! ✅");
-            } catch (error) {
-                console.error(error);
-                setSyncStatus(false, "Gagal upload. Menunggu koneksi... ⚠");
-            }
+            } catch (error) { setSyncStatus(false, "Gagal upload. Menunggu koneksi... ⚠"); }
         }
 
-        function initApp() {
-            updateModisDatalist();
-            updateFilterDropdowns();
-            renderDashboard();
-        }
+        function initApp() { updateModisDatalist(); updateFilterDropdowns(); renderDashboard(); terapkanFilter(); }
 
         function switchTab(tabId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('page-' + tabId).classList.add('active');
-            event.target.classList.add('active');
-
+            document.getElementById('page-' + tabId).classList.add('active'); event.target.classList.add('active');
             if(tabId === 'dashboard') renderDashboard();
-            if(tabId === 'list') {
-                document.getElementById('searchInput').value = '';
-                document.getElementById('filterModis').value = '';
-                updateFilterShelf();
-            }
+            if(tabId === 'list') { document.getElementById('searchInput').value = ''; document.getElementById('filterModis').value = ''; updateFilterShelf(); }
         }
 
         function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg; toast.className = 'show';
+            const toast = document.getElementById('toast'); toast.innerText = msg; toast.className = 'show';
             setTimeout(() => { toast.className = ''; }, 2500);
         }
 
         function formatTanggal(tglString) {
-            return new Date(tglString).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            if(!tglString) return "-"; return new Date(tglString).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        // FUNGSI GET PULL DATE (TANGGAL PENARIKAN)
+        function getPullDate(expDateStr, tarikDays) {
+            let d = new Date(expDateStr);
+            d.setDate(d.getDate() - (tarikDays || 0));
+            return d;
         }
 
         function hitungSelisihHari(tglTujuan) {
+            if(!tglTujuan) return 9999;
             const today = new Date(); today.setHours(0,0,0,0);
             const target = new Date(tglTujuan); target.setHours(0,0,0,0);
             return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
         }
 
-        // --- MANAJEMEN DATA ---
         function simpanBarang() {
-            const nama = document.getElementById('nama').value;
-            const modis = document.getElementById('modis').value;
-            const shelf = document.getElementById('shelf').value;
-            const baris = document.getElementById('baris').value;
-            const expDate = document.getElementById('expDate').value;
-            const tarikDays = document.getElementById('tarikDays').value;
+            const nama = document.getElementById('nama').value; const modis = document.getElementById('modis').value;
+            const shelf = document.getElementById('shelf').value; const baris = document.getElementById('baris').value;
+            const expDate = document.getElementById('expDate').value; const tarikDays = document.getElementById('tarikDays').value;
 
-            if(!nama || !modis || !shelf || !baris || !expDate || !tarikDays) {
-                alert("Isi semua data lokasinya ya!"); return;
-            }
+            if(!nama || !modis || !shelf || !baris) { alert("Nama Produk, Modis, Shelf, dan Baris wajib diisi!"); return; }
 
-            dbBarang.push({
-                id: Date.now().toString(),
-                nama, modis, shelf: parseInt(shelf), baris: parseInt(baris), 
-                expDate, tarikDays: parseInt(tarikDays)
-            });
+            dbBarang.push({ id: Date.now().toString(), nama, modis, shelf: shelf, baris: parseInt(baris), expDate: expDate || "", tarikDays: tarikDays ? parseInt(tarikDays) : 60 });
 
-            ['nama','modis','shelf','baris','expDate','tarikDays'].forEach(id => document.getElementById(id).value = '');
-            showToast("Data ditambahkan!");
-            initApp();
-            pushDataKeGoogleSheet();
+            ['nama','shelf','baris','expDate','tarikDays'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('modis').value = (pinnedModis !== "") ? pinnedModis : '';
+            document.getElementById('shelf').value = (pinnedShelf !== "") ? pinnedShelf : '';
+
+            showToast("Data barang tersimpan!"); initApp(); pushDataKeGoogleSheet();
         }
 
-        // --- BUKA MODAL DENGAN FULL DATA ---
+        function renderIncompleteItems() {
+            const container = document.getElementById('incompleteItemsList'); let htmlStr = ''; 
+            let curModis = document.getElementById('modis').value; let curShelf = document.getElementById('shelf').value;
+
+            let incomplete = dbBarang.filter(i => !i.expDate || i.expDate === "");
+            if (curModis) incomplete = incomplete.filter(i => i.modis === curModis);
+            if (curShelf) incomplete = incomplete.filter(i => String(i.shelf) === String(curShelf));
+
+            // UPDATE TOTAL BADGE
+            const badge = document.getElementById('totalIncompleteBadge');
+            if(badge) badge.innerText = `Total: ${incomplete.length}`;
+
+            if(incomplete.length === 0) {
+               container.innerHTML = `<div class="empty-state">✨ Mantap! Tidak ada barang yang bolong tanggal expired-nya di lokasi ini.</div>`; return;
+            }
+
+            incomplete.forEach(item => {
+                htmlStr += `
+                    <div class="compact-card warning">
+                        <div class="c-title" style="color:#f1f5f9; font-size:15px; margin-bottom:2px;">${item.nama}</div>
+                        <div style="font-size:11px; color:#94a3b8; margin-bottom:10px;">📍 Modis: ${item.modis} | Shelf: ${item.shelf} | Baris: ${item.baris}</div>
+                        <div class="input-row" style="margin-bottom:8px;">
+                            <div class="form-group" style="margin:0;"><input type="date" id="inc_exp_${item.id}" style="padding:10px 8px; font-size:12px;"></div>
+                            <div class="form-group" style="margin:0;"><input type="number" id="inc_tarik_${item.id}" placeholder="H- Tarik" value="${item.tarikDays || 60}" style="padding:10px 8px; font-size:12px;"></div>
+                        </div>
+                        <button class="btn-primary" style="padding:10px; margin-top:0;" onclick="simpanIncomplete('${item.id}')">💾 Simpan Tanggal</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = htmlStr;
+        }
+
+        function simpanIncomplete(id) {
+            const tgl = document.getElementById(`inc_exp_${id}`).value; const tarik = document.getElementById(`inc_tarik_${id}`).value;
+            if(!tgl || !tarik) { alert('Isi lengkap tanggal dan angka H- tariknya ya!'); return; }
+            const idx = dbBarang.findIndex(x => x.id === id);
+            if(idx > -1) {
+                dbBarang[idx].expDate = tgl; dbBarang[idx].tarikDays = parseInt(tarik);
+                showToast('Tanggal Expired Terkunci! ✅'); renderIncompleteItems(); initApp(); pushDataKeGoogleSheet();
+            }
+        }
+
         function bukaModalTindakan(id) {
             const item = dbBarang.find(x => x.id === id);
-            
-            document.getElementById('editId').value = item.id;
-            document.getElementById('editNama').value = item.nama;
-            document.getElementById('editModis').value = item.modis;
-            document.getElementById('editShelf').value = item.shelf;
-            document.getElementById('editBaris').value = item.baris;
-            document.getElementById('editExpDate').value = item.expDate;
-            document.getElementById('editTarikDays').value = item.tarikDays;
-            
-            document.getElementById('modalTindakan').classList.add('active');
+            document.getElementById('editId').value = item.id; document.getElementById('editNama').value = item.nama;
+            document.getElementById('editModis').value = item.modis; document.getElementById('editShelf').value = item.shelf;
+            document.getElementById('editBaris').value = item.baris; document.getElementById('editExpDate').value = item.expDate || "";
+            document.getElementById('editTarikDays').value = item.tarikDays || 60; document.getElementById('modalTindakan').classList.add('active');
         }
 
         function tutupModal() { document.getElementById('modalTindakan').classList.remove('active'); }
 
-        // --- SIMPAN TINDAKAN (FULL DATA UPDATE) ---
         function simpanTindakan() {
-            const id = document.getElementById('editId').value;
-            const newNama = document.getElementById('editNama').value;
-            const newModis = document.getElementById('editModis').value;
-            const newShelf = document.getElementById('editShelf').value;
-            const newBaris = document.getElementById('editBaris').value;
-            const newExp = document.getElementById('editExpDate').value;
+            const id = document.getElementById('editId').value; const newNama = document.getElementById('editNama').value;
+            const newModis = document.getElementById('editModis').value; const newShelf = document.getElementById('editShelf').value;
+            const newBaris = document.getElementById('editBaris').value; const newExp = document.getElementById('editExpDate').value;
             const newTarik = document.getElementById('editTarikDays').value;
 
-            if(!newNama || !newModis || !newExp || !newTarik) return alert("Jangan ada data yang dikosongkan!");
+            if(!newNama || !newModis || !newShelf || !newBaris) return alert("Jangan kosongkan data lokasi dan nama!");
 
             let index = dbBarang.findIndex(x => x.id === id);
             if(index !== -1) {
-                dbBarang[index].nama = newNama;
-                dbBarang[index].modis = newModis;
-                dbBarang[index].shelf = parseInt(newShelf);
-                dbBarang[index].baris = parseInt(newBaris);
-                dbBarang[index].expDate = newExp;
-                dbBarang[index].tarikDays = parseInt(newTarik);
-                
-                tutupModal();
-                initApp();
-                terapkanFilter();
-                showToast("Pembaruan berhasil!");
-                pushDataKeGoogleSheet();
+                dbBarang[index].nama = newNama; dbBarang[index].modis = newModis; dbBarang[index].shelf = newShelf;
+                dbBarang[index].baris = parseInt(newBaris); dbBarang[index].expDate = newExp || ""; dbBarang[index].tarikDays = parseInt(newTarik) || 60;
+                tutupModal(); initApp(); showToast("Pembaruan berhasil!"); pushDataKeGoogleSheet();
             }
         }
 
         function hapusBarangDariSistem() {
             const id = document.getElementById('editId').value;
-            if(confirm("Yakin barang ini sudah ditarik dan mau dihapus permanen dari sistem?")) {
-                dbBarang = dbBarang.filter(x => x.id !== id);
-                tutupModal();
-                initApp();
-                terapkanFilter();
-                showToast("Barang dihapus!");
-                pushDataKeGoogleSheet();
+            if(confirm("Yakin barang ini mau dihapus permanen dari sistem?")) {
+                dbBarang = dbBarang.filter(x => x.id !== id); tutupModal(); initApp(); showToast("Barang dihapus!"); pushDataKeGoogleSheet();
             }
         }
 
-        function resetSemuaData() {
-            if (confirm("🚨 PERINGATAN BAHAYA 🚨\n\nApakah kamu YAKIN ingin MENGHAPUS SEMUA DATA BARANG?")) {
-                if (confirm("TINDAKAN INI TIDAK BISA DIBATALKAN!\n\nLanjutkan?")) {
-                    dbBarang = []; 
-                    initApp();
-                    terapkanFilter();
-                    showToast("Sapu jagat berhasil!");
-                    pushDataKeGoogleSheet(); 
-                }
-            }
-        }
-
-        // --- FILTER & RENDER ---
-        function updateModisDatalist() {
-            const unikModis = [...new Set(dbBarang.map(i => i.modis))];
-            document.getElementById('modisHistory').innerHTML = unikModis.map(m => `<option value="${m}">`).join('');
-        }
-
-        function updateFilterDropdowns() {
-            const optModis = document.getElementById('filterModis');
-            const unikModis = [...new Set(dbBarang.map(i => i.modis))].sort();
-            let currentVal = optModis.value;
-            optModis.innerHTML = '<option value="">Semua Modis</option>' + unikModis.map(m => `<option value="${m}">${m}</option>`).join('');
-            optModis.value = currentVal; 
-            updateFilterShelf();
-        }
-
-        function updateFilterShelf() {
-            const pilihModis = document.getElementById('filterModis').value;
-            const optShelf = document.getElementById('filterShelf');
-            let filteredShelfData = pilihModis !== '' ? dbBarang.filter(i => i.modis === pilihModis) : dbBarang;
-            const unikShelf = [...new Set(filteredShelfData.map(i => i.shelf))].sort((a,b) => a - b);
-            
-            optShelf.innerHTML = '<option value="">Semua Shelving</option>' + unikShelf.map(s => `<option value="${s}">Shelving ${s}</option>`).join('');
-            terapkanFilter();
-        }
-
-        function terapkanFilter() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const fModis = document.getElementById('filterModis').value;
-            const fShelf = document.getElementById('filterShelf').value;
-            const listContainer = document.getElementById('allList');
-            listContainer.innerHTML = '';
-
-            let dataSaring = dbBarang.filter(item => {
-                return item.nama.toLowerCase().includes(query) && 
-                       (fModis === '' || item.modis === fModis) && 
-                       (fShelf === '' || item.shelf.toString() === fShelf);
-            });
-
-            dataSaring.sort((a, b) => {
-                if(a.modis !== b.modis) return a.modis.localeCompare(b.modis);
-                if(a.shelf !== b.shelf) return a.shelf - b.shelf;
-                return a.baris - b.baris;
-            });
-
-            if(dataSaring.length === 0) {
-                listContainer.innerHTML = `<div class="empty-state">Data tidak ditemukan.</div>`; return;
-            }
-
-            dataSaring.forEach(item => {
-                const sisaHari = hitungSelisihHari(item.expDate);
-                let tipe = 'safe', txtBadge = '✅ Aman', classCard = '';
-                if (sisaHari < 0) { tipe = 'dang'; txtBadge = '❌ Expired'; classCard = 'danger'; }
-                else if (sisaHari <= item.tarikDays) { tipe = 'warn'; txtBadge = `⚠️ Tarik (H-${sisaHari})`; classCard = 'warning'; }
-
-                listContainer.innerHTML += `
-                    <div class="compact-card ${classCard}">
-                        <div class="c-header">
-                            <div class="c-title">${item.nama}</div>
-                            <span class="badge ${tipe}">${txtBadge}</span>
-                        </div>
-                        <div class="c-body">
-                            <div class="c-row">
-                                <span>📍 <span class="highlight">${item.modis}</span> | Shelf: <b>${item.shelf}</b> | Baris: <b>${item.baris}</b></span>
-                                <button class="btn-action" onclick="bukaModalTindakan('${item.id}')">Edit</button>
-                            </div>
-                            <div class="c-row">
-                                <span>⏳ Exp: ${formatTanggal(item.expDate)} (Tarik H-${item.tarikDays})</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
+        // --- DASHBOARD: PLANNING & COUNTDOWN ---
+        function setDashFilter(filterKey) {
+            currentDashFilter = filterKey;
+            renderDashboard();
         }
 
         function renderDashboard() {
-            const listContainer = document.getElementById('actionList');
-            listContainer.innerHTML = '';
+            const listContainer = document.getElementById('actionList'); 
+            const filterContainer = document.getElementById('dashMonthFilters');
+            const totalBadge = document.getElementById('dashTotalBadge');
             
-            let dataNotif = dbBarang.filter(i => hitungSelisihHari(i.expDate) <= i.tarikDays);
-            dataNotif.sort((a,b) => new Date(a.expDate) - new Date(b.expDate)); 
+            let htmlStr = ''; 
+            
+            let itemsWithExp = dbBarang.filter(i => i.expDate && i.expDate.trim() !== "");
+            let futureMonths = new Set();
+            const today = new Date(); today.setHours(0,0,0,0);
 
-            if(dataNotif.length === 0) {
-                listContainer.innerHTML = `<div class="empty-state">✨<br>Aman bro! Nggak ada jadwal narik barang.</div>`; return;
+            // Hitung Tanggal Tarik & Status untuk tiap barang
+            let dataWithPullInfo = itemsWithExp.map(item => {
+                let pDate = getPullDate(item.expDate, item.tarikDays);
+                let sisaHariExp = hitungSelisihHari(item.expDate);
+                let sisaHariTarik = Math.ceil((pDate - today) / (1000 * 60 * 60 * 24));
+                
+                let yyyy_mm = pDate.getFullYear() + "-" + String(pDate.getMonth() + 1).padStart(2, '0');
+                if (sisaHariTarik > 0) futureMonths.add(yyyy_mm); // Kumpulkan bulan masa depan
+                
+                return { ...item, pDate, sisaHariExp, sisaHariTarik, yyyy_mm };
+            });
+
+            // Susun Tombol Filter Bulan
+            let sortedMonths = [...futureMonths].sort();
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            
+            let btnHtml = `<button class="btn-action" style="margin:0; padding:8px 12px; flex-shrink:0; font-size:12px; ${currentDashFilter === 'segera' ? 'background:#ef4444;' : 'background:#334155;'}" onclick="setDashFilter('segera')">🚨 Segera / Lewat</button>`;
+            
+            sortedMonths.forEach(m => {
+                let [y, mo] = m.split('-');
+                let label = `${monthNames[parseInt(mo)-1]} ${y}`;
+                let bg = currentDashFilter === m ? 'background:#3b82f6;' : 'background:#334155;';
+                btnHtml += `<button class="btn-action" style="margin:0; padding:8px 12px; flex-shrink:0; font-size:12px; ${bg}" onclick="setDashFilter('${m}')">📅 ${label}</button>`;
+            });
+            filterContainer.innerHTML = btnHtml;
+
+            // Saring Data Berdasarkan Tab yang Aktif
+            let filteredData = [];
+            if (currentDashFilter === 'segera') {
+                filteredData = dataWithPullInfo.filter(i => i.sisaHariTarik <= 0);
+            } else {
+                filteredData = dataWithPullInfo.filter(i => i.sisaHariTarik > 0 && i.yyyy_mm === currentDashFilter);
             }
 
-            dataNotif.forEach(item => {
-                const sisaHari = hitungSelisihHari(item.expDate);
-                let tipe = (sisaHari < 0) ? 'dang' : 'warn', txtBadge = (sisaHari < 0) ? '🔴 KADALUARSA' : `🟡 TARIK (H-${sisaHari})`, classCard = (sisaHari < 0) ? 'danger' : 'warning';
+            filteredData.sort((a,b) => a.pDate - b.pDate); // Urutkan dari yg jadwal tariknya paling dekat
+            
+            // Update Angka Total di Header Dashboard
+            totalBadge.innerText = `Total: ${filteredData.length}`;
 
-                listContainer.innerHTML += `
+            if(filteredData.length === 0) { 
+                listContainer.innerHTML = `<div class="empty-state">✨<br>Aman bro! Nggak ada jadwal penarikan di kategori ini.</div>`; 
+                return; 
+            }
+
+            filteredData.forEach(item => {
+                let tipe = 'safe', txtBadge = '', classCard = '';
+                let infoTarik = '';
+
+                if (item.sisaHariExp < 0) {
+                    tipe = 'dang'; txtBadge = '🔴 KADALUARSA'; classCard = 'danger';
+                    infoTarik = `Sudah lewat ${Math.abs(item.sisaHariExp)} hari dari Tgl Expired!`;
+                } else if (item.sisaHariTarik <= 0) {
+                    tipe = 'warn'; txtBadge = '🟡 WAKTUNYA TARIK'; classCard = 'warning';
+                    infoTarik = item.sisaHariTarik === 0 ? "Tarik Hari Ini!" : `Lewat jadwal tarik ${Math.abs(item.sisaHariTarik)} hari`;
+                } else {
+                    tipe = 'safe'; txtBadge = '🟢 PERSIAPAN'; classCard = '';
+                    infoTarik = `Tarik dalam ${item.sisaHariTarik} hari lagi`;
+                }
+
+                htmlStr += `
                     <div class="compact-card ${classCard}">
                         <div class="c-header"><div class="c-title">${item.nama}</div><span class="badge ${tipe}">${txtBadge}</span></div>
                         <div class="c-body">
                             <span>📍 ${item.modis} | S: ${item.shelf} | B: ${item.baris}</span>
-                            <span>⏳ Exp: ${formatTanggal(item.expDate)}</span>
-                            <button class="btn-action" style="margin-top:6px; background:#475569" onclick="bukaModalTindakan('${item.id}')">✏️ Edit / Selesaikan</button>
+                            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:6px;">
+                                <div style="display:flex; flex-direction:column;">
+                                    <span>⏳ Exp: ${formatTanggal(item.expDate)}</span>
+                                    <span style="color:#fcd34d; font-weight:600; margin-top:2px;">🔔 ${infoTarik}</span>
+                                </div>
+                                <button class="btn-action" style="margin:0; background:#475569" onclick="bukaModalTindakan('${item.id}')">✏️ Selesaikan</button>
+                            </div>
                         </div>
                     </div>
                 `;
             });
+            listContainer.innerHTML = htmlStr;
+        }
+
+        // --- UPDATE FUNGSI LIST UTAMA (DIPERTAHANKAN) ---
+        function updateModisDatalist() {
+            syncModisList(); document.getElementById('modisHistory').innerHTML = customModisList.map(m => `<option value="${m}">`).join('');
+        }
+
+        function updateFilterDropdowns() {
+            const optModis = document.getElementById('filterModis'); const unikModis = [...new Set(dbBarang.map(i => i.modis))].sort();
+            let currentVal = optModis.value; optModis.innerHTML = '<option value="">Semua Modis</option>' + unikModis.map(m => `<option value="${m}">${m}</option>`).join('');
+            optModis.value = currentVal; updateFilterShelf();
+        }
+
+        function updateFilterShelf() {
+            const pilihModis = document.getElementById('filterModis').value; const optShelf = document.getElementById('filterShelf');
+            let filteredShelfData = pilihModis !== '' ? dbBarang.filter(i => i.modis === pilihModis) : dbBarang;
+            const unikShelf = [...new Set(filteredShelfData.map(i => i.shelf))].sort((a, b) => {
+                let numA = parseInt(a), numB = parseInt(b);
+                if(!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return String(a).localeCompare(String(b));
+            });
+            optShelf.innerHTML = '<option value="">Semua Shelving</option>' + unikShelf.map(s => `<option value="${s}">Shelving ${s}</option>`).join('');
+            terapkanFilter();
+        }
+
+        function toggleExpandList(expand) {
+            isExpandedView = expand; terapkanFilter();
+            if(!expand) window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        function terapkanFilter() {
+            const query = document.getElementById('searchInput').value.toLowerCase(); 
+            const fModis = document.getElementById('filterModis').value; 
+            const fShelf = document.getElementById('filterShelf').value;
+            const listContainer = document.getElementById('allList'); 
+            let htmlStr = ''; 
+
+            let dataSaring = dbBarang.filter(item => {
+                return item.nama.toLowerCase().includes(query) && 
+                       (fModis === '' || item.modis === fModis) && 
+                       (fShelf === '' || String(item.shelf) === fShelf);
+            });
+
+            document.getElementById('totalBarang').innerText = dataSaring.length;
+
+            const btnTutup = document.getElementById('btnTutupDataTop');
+            const btnLihat = document.getElementById('btnLihatSemuaBottom');
+            let dataToRender = [];
+
+            if (fModis === '' && fShelf === '' && query === '') {
+                dataSaring.sort((a, b) => b.id.localeCompare(a.id)); 
+                if (!isExpandedView && dataSaring.length > 5) {
+                    dataToRender = dataSaring.slice(0, 5);
+                    btnLihat.style.display = 'block'; btnTutup.style.display = 'none';
+                } else {
+                    dataToRender = dataSaring;
+                    if (dataSaring.length > 5) { btnLihat.style.display = 'none'; btnTutup.style.display = 'block'; } 
+                    else { btnLihat.style.display = 'none'; btnTutup.style.display = 'none'; }
+                }
+            } else {
+                dataSaring.sort((a, b) => {
+                    if(a.modis !== b.modis) return a.modis.localeCompare(b.modis);
+                    let shelfA = parseInt(a.shelf), shelfB = parseInt(b.shelf);
+                    if(!isNaN(shelfA) && !isNaN(shelfB) && shelfA !== shelfB) return shelfA - shelfB;
+                    if(String(a.shelf) !== String(b.shelf)) return String(a.shelf).localeCompare(String(b.shelf));
+                    return a.baris - b.baris;
+                });
+                dataToRender = dataSaring;
+                btnLihat.style.display = 'none'; btnTutup.style.display = 'none'; isExpandedView = false;
+            }
+
+            if(dataToRender.length === 0) { listContainer.innerHTML = `<div class="empty-state">Data tidak ditemukan.</div>`; return; }
+
+            dataToRender.forEach(item => {
+                let tipe = 'safe', txtBadge = '✅ Aman', classCard = '';
+                if (!item.expDate || item.expDate === "") {
+                    tipe = 'warn'; txtBadge = '⚠️ Belum Ada Expired'; classCard = 'warning';
+                } else {
+                    const sisaHari = hitungSelisihHari(item.expDate);
+                    if (sisaHari < 0) { tipe = 'dang'; txtBadge = '❌ Expired'; classCard = 'danger'; }
+                    else if (sisaHari <= item.tarikDays) { tipe = 'warn'; txtBadge = `⚠️ Tarik (H-${sisaHari})`; classCard = 'warning'; }
+                }
+
+                htmlStr += `
+                    <div class="compact-card ${classCard}">
+                        <div class="c-header"><div class="c-title">${item.nama}</div><span class="badge ${tipe}">${txtBadge}</span></div>
+                        <div class="c-body">
+                            <div class="c-row"><span>📍 <span class="highlight">${item.modis}</span> | Shelf: <b>${item.shelf}</b> | Baris: <b>${item.baris}</b></span><button class="btn-action" onclick="bukaModalTindakan('${item.id}')">Edit</button></div>
+                            <div class="c-row"><span>⏳ Exp: ${formatTanggal(item.expDate)} (Tarik H-${item.tarikDays})</span></div>
+                        </div>
+                    </div>
+                `;
+            });
+            listContainer.innerHTML = htmlStr;
         }
     </script>
 </body>
 </html>
+

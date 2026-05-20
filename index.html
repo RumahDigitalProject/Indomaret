@@ -183,6 +183,12 @@
     <div class="container">
         <div id="page-dashboard" class="page active">
             <div class="card">
+                
+                <div id="boxNotifSetup" style="display: none; margin-bottom: 15px; padding: 10px; background: rgba(59, 130, 246, 0.15); border: 1px dashed #3b82f6; border-radius: 10px; text-align: center;">
+                    <p style="font-size: 11px; color: #bfdbfe; margin: 0 0 8px 0;">Biar HP kamu bisa kasih peringatan otomatis barang yang mau ditarik, aktifkan notifikasi ya!</p>
+                    <button class="btn-action" style="background: #2563eb; padding: 8px 15px;" onclick="mintaIzinNotif()">🔔 Aktifkan Notif Sistem</button>
+                </div>
+
                 <div class="chart-container">
                     <div id="donutChart" class="donut-chart" style="background: conic-gradient(#10b981 0% 0%, #f59e0b 0% 0%, #ef4444 0% 0%, #64748b 0% 100%);">
                         <div class="donut-inner"></div>
@@ -411,6 +417,7 @@
             setupPWA(); 
             initApp(); 
             tarikDataGoogleSheet(); 
+            cekStatusNotif();
         };
 
         document.addEventListener('click', function(e) {
@@ -424,6 +431,75 @@
             const d = new Date();
             return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,'0') + "-" + String(d.getDate()).padStart(2,'0');
         }
+
+        // --- FITUR BARU: NOTIFIKASI SISTEM (ASISTEN PAGI) ---
+        function cekStatusNotif() {
+            if (!("Notification" in window)) return;
+            const notifBox = document.getElementById('boxNotifSetup');
+            if (Notification.permission === "default") {
+                notifBox.style.display = 'block';
+            } else {
+                notifBox.style.display = 'none';
+            }
+        }
+
+        function mintaIzinNotif() {
+            if (!("Notification" in window)) {
+                alert("Sayang sekali, browser HP-mu belum support notifikasi sistem.");
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                cekStatusNotif();
+                if(permission === 'granted') {
+                    showToast("Mantap! Notifikasi berhasil diaktifkan 🔔");
+                    periksaNotifikasiHarian(true); // Paksa cek saat baru diizinkan
+                }
+            });
+        }
+
+        function periksaNotifikasiHarian(force = false) {
+            if (!("Notification" in window) || Notification.permission !== "granted") return;
+            
+            const todayStr = getTodayString();
+            const lastNotif = localStorage.getItem('returHubLastNotifDate');
+            
+            // Cek apakah sudah diingatkan hari ini
+            if (lastNotif !== todayStr || force) {
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                
+                let countTarik = 0;
+                dbBarang.forEach(item => {
+                    if (item.expDate && item.expDate.trim() !== "" && !item.isCalibrated) {
+                        let pDate = getPullDate(item.expDate, item.tarikDays);
+                        let sisaTarik = Math.ceil((pDate - today) / (1000 * 60 * 60 * 24));
+                        if (sisaTarik <= 0) countTarik++;
+                    }
+                });
+
+                if (countTarik > 0) {
+                    const title = "🚨 Waktunya Tarik Barang!";
+                    const options = {
+                        body: `Bos, ada ${countTarik} barang yang harus segera ditarik dari rak hari ini. Yuk cek aplikasi ReturHub!`,
+                        icon: "https://cdn-icons-png.flaticon.com/512/2897/2897785.png",
+                        vibrate: [200, 100, 200] // Efek getar di HP
+                    };
+
+                    const notif = new Notification(title, options);
+                    
+                    // Kalau notifikasi diklik, langsung arahkan ke tab Dashboard
+                    notif.onclick = function() {
+                        window.focus();
+                        switchTab('dashboard');
+                        setDashFilter('segera');
+                        notif.close();
+                    };
+
+                    localStorage.setItem('returHubLastNotifDate', todayStr);
+                }
+            }
+        }
+        // ----------------------------------------------------
 
         // --- FITUR LOGIKA TARGET HARIAN ---
         function generateTargetQueue(maxItems) {
@@ -782,6 +858,10 @@
 
                 dbBarang = freshData; localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
                 syncModisList(); initApp();
+                
+                // Memicu notifikasi setelah data paling segar didapat
+                periksaNotifikasiHarian();
+
                 if(currentInputMode === 'tgl') renderIncompleteItems();
                 setSyncStatus(false, "Sinkronisasi selesai! ✅");
             } catch (error) { setSyncStatus(false, "Mode Offline Aktif ⚠"); }
@@ -878,6 +958,7 @@
         function showToast(msg) {
             const toast = document.getElementById('toast'); toast.innerText = msg; toast.className = 'show';
             setTimeout(() => { toast.className = ''; }, 2500);
+            if (navigator.vibrate) navigator.vibrate(50); // Getar halus
         }
 
         function formatTanggal(tglString) {

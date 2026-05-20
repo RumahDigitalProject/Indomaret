@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
+    <link id="pwaManifest" rel="manifest" href="">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2897/2897785.png">
+
     <title>ReturHub - Online Inventory</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
@@ -54,6 +62,14 @@
         .card { background: #1e293b; border-radius: 14px; padding: 15px; margin-bottom: 15px; border: 1px solid #334155; }
         h2 { margin-top: 0; font-size: 16px; color: #f8fafc; margin-bottom: 12px; }
 
+        /* CHART DASHBOARD */
+        .chart-container { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 15px; background: #0f172a; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .donut-chart { width: 80px; height: 80px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: background 0.5s; }
+        .donut-inner { width: 50px; height: 50px; background: #0f172a; border-radius: 50%; }
+        .chart-legend { flex: 1; font-size: 11px; display: flex; flex-direction: column; gap: 6px; }
+        .legend-item { display: flex; justify-content: space-between; color: #cbd5e1; font-weight: 500; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
         /* INPUT & SELECT */
         .form-group { margin-bottom: 12px; }
         label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 5px; }
@@ -71,25 +87,14 @@
         .input-row { display: flex; gap: 10px; }
         .input-row .form-group { flex: 1; }
 
-        /* TOGGLE MODE INPUT TANGGAL VS BARU */
-        .mode-toggle-box {
-            display: flex; background: #0f172a; border-radius: 10px; padding: 4px; margin-bottom: 15px; border: 1px solid #334155;
-        }
-        .mode-btn {
-            flex: 1; background: transparent; border: none; color: #94a3b8; padding: 10px; 
-            border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Poppins';
-        }
+        /* TOGGLE MODE INPUT */
+        .mode-toggle-box { display: flex; background: #0f172a; border-radius: 10px; padding: 4px; margin-bottom: 15px; border: 1px solid #334155; }
+        .mode-btn { flex: 1; background: transparent; border: none; color: #94a3b8; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Poppins'; }
         .mode-btn.active { background: #3b82f6; color: white; box-shadow: 0 2px 8px rgba(59,130,246,0.4); }
 
-        /* CUSTOM DROPDOWN MODIS & SHELF */
-        .custom-dropdown {
-            position: absolute; top: 100%; left: 0; width: 100%; background: #1e293b; 
-            border: 1px solid #3b82f6; border-radius: 8px; margin-top: 4px; z-index: 50; 
-            padding: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 8px;
-        }
-        .modis-item {
-            display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px 12px; border-radius: 6px; cursor: pointer; border: 1px solid #334155;
-        }
+        /* DROPDOWN CUSTOM */
+        .custom-dropdown { position: absolute; top: 100%; left: 0; width: 100%; background: #1e293b; border: 1px solid #3b82f6; border-radius: 8px; margin-top: 4px; z-index: 50; padding: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 8px; }
+        .modis-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px 12px; border-radius: 6px; cursor: pointer; border: 1px solid #334155; }
         .modis-item:active { background: #1e3a8a; }
         .modis-item span { flex: 1; font-size: 13px; font-weight: 600; color: #f8fafc; }
         
@@ -113,14 +118,9 @@
         .btn-action { background: #3b82f6; border: none; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
         .btn-danger { background: #dc2626; border: none; color: white; padding: 10px; width: 100%; border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 10px; cursor: pointer; }
 
-        /* DASHBOARD MONTH SCROLL */
-        .month-scroll-container {
-            display: flex; overflow-x: auto; gap: 8px; padding-bottom: 8px; margin-bottom: 15px; border-bottom: 1px solid #334155;
-            -ms-overflow-style: none; scrollbar-width: none;
-        }
+        /* SCROLL & CARDS */
+        .month-scroll-container { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 8px; margin-bottom: 15px; border-bottom: 1px solid #334155; -ms-overflow-style: none; scrollbar-width: none; }
         .month-scroll-container::-webkit-scrollbar { display: none; }
-
-        /* KARTU LIST DATA */
         .compact-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px; margin-bottom: 10px; position: relative; border-left: 4px solid #3b82f6; }
         .compact-card.danger { border-left-color: #dc2626; background: rgba(220, 38, 38, 0.05); }
         .compact-card.warning { border-left-color: #eab308; background: rgba(234, 179, 8, 0.05); }
@@ -135,7 +135,7 @@
         .c-row { display: flex; justify-content: space-between; align-items: flex-end;}
         .highlight { color: #60a5fa; font-weight: 600; }
 
-        /* MODAL FULL EDIT & PROGRESS */
+        /* MODALS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(5px); align-items: center; justify-content: center; }
         .modal-overlay.active { display: flex; }
         .modal-content { background: #1e293b; width: 95%; max-width: 380px; padding: 20px; border-radius: 16px; border: 1px solid #3b82f6; max-height: 90vh; overflow-y: auto; }
@@ -183,6 +183,18 @@
     <div class="container">
         <div id="page-dashboard" class="page active">
             <div class="card">
+                <div class="chart-container">
+                    <div id="donutChart" class="donut-chart" style="background: conic-gradient(#10b981 0% 0%, #f59e0b 0% 0%, #ef4444 0% 0%, #64748b 0% 100%);">
+                        <div class="donut-inner"></div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><span style="display:flex; align-items:center;"><span class="dot" style="background:#10b981;"></span>Aman</span> <span id="lgAman">0</span></div>
+                        <div class="legend-item"><span style="display:flex; align-items:center;"><span class="dot" style="background:#f59e0b;"></span>Siap Tarik</span> <span id="lgTarik">0</span></div>
+                        <div class="legend-item"><span style="display:flex; align-items:center;"><span class="dot" style="background:#ef4444;"></span>Kadaluarsa</span> <span id="lgExp">0</span></div>
+                        <div class="legend-item"><span style="display:flex; align-items:center;"><span class="dot" style="background:#64748b;"></span>Kosong/Lain</span> <span id="lgKosong">0</span></div>
+                    </div>
+                </div>
+
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
                     <h2 style="margin:0;">🚨 Jadwal Tarik Barang</h2>
                     <span class="badge warn" style="font-size:12px; padding:4px 8px;" id="dashTotalBadge">Total: 0</span>
@@ -344,8 +356,7 @@
             <h2 style="margin-bottom: 5px; font-size: 16px; color: #10b981;">🎯 Target Input Harian</h2>
             <p id="targetSubtitle" style="font-size: 11px; color: #94a3b8; margin-top: 0; margin-bottom: 15px;">Dikelompokkan rapi berdasarkan Rak yang sama biar kerjanya nggak bolak-balik!</p>
             
-            <div id="listTargetHarian" style="display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow-y: auto; margin-bottom: 15px;">
-                </div>
+            <div id="listTargetHarian" style="display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow-y: auto; margin-bottom: 15px;"></div>
 
             <div id="boxBtnTarget" style="display: none;">
                 <button class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-size: 14px; padding: 15px;" onclick="mulaiTargetHarian()">🚀 Mulai Kerjakan Target Ini</button>
@@ -357,6 +368,28 @@
     <div id="toast">Notifikasi</div>
 
     <script>
+        // --- SETUP PWA (APP INSTALLER) ---
+        function setupPWA() {
+            const manifest = {
+                name: "ReturHub Inventory",
+                short_name: "ReturHub",
+                display: "standalone",
+                background_color: "#0f172a",
+                theme_color: "#2563eb",
+                icons: [{ src: "https://cdn-icons-png.flaticon.com/512/2897/2897785.png", sizes: "512x512", type: "image/png" }]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            document.getElementById('pwaManifest').setAttribute('href', manifestURL);
+
+            if ('serviceWorker' in navigator) {
+                const swCode = "self.addEventListener('fetch', function(e) { });";
+                const swBlob = new Blob([swCode], {type: 'application/javascript'});
+                const swURL = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(swURL).catch(err => console.log('PWA SW failed', err));
+            }
+        }
+
         const URL_GOOGLE_SHEET = 'https://script.google.com/macros/s/AKfycbwA3uvzmYyjttATknVVWk8dzkCu3se9byGBkZ6h93ZaJhYquPG_8zHyNI6rpkLDYc-v/exec';
         
         let dbBarang = JSON.parse(localStorage.getItem('returHubCache')) || [];
@@ -369,10 +402,16 @@
         let isExpandedView = false;
         let currentDashFilter = 'segera'; 
 
-        // VARIABEL GLOBAL UNTUK TARGET HARIAN
+        // VARIABEL GLOBAL
         let isTargetMode = false;
+        let targetModeIds = []; 
+        let calibratedIds = JSON.parse(localStorage.getItem('returHubCalibratedIds')) || [];
 
-        window.onload = () => { initApp(); tarikDataGoogleSheet(); };
+        window.onload = () => { 
+            setupPWA(); 
+            initApp(); 
+            tarikDataGoogleSheet(); 
+        };
 
         document.addEventListener('click', function(e) {
             const modisInput = document.getElementById('modis'), modisDropdown = document.getElementById('modisDropdown');
@@ -381,25 +420,38 @@
             if (e.target !== shelfInput && !shelfDropdown.contains(e.target)) shelfDropdown.style.display = 'none';
         });
 
-        // --- FUNGSI MENDAPATKAN TANGGAL HARI INI ---
         function getTodayString() {
             const d = new Date();
             return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,'0') + "-" + String(d.getDate()).padStart(2,'0');
         }
 
-        // --- FITUR BARU: LOGIKA TARGET HARIAN ---
+        // --- FITUR LOGIKA TARGET HARIAN ---
+        function generateTargetQueue(maxItems) {
+            let allIncomplete = dbBarang.filter(i => (!i.expDate || i.expDate.trim() === "") && !i.isCalibrated);
+            allIncomplete.sort((a,b) => {
+                if(a.modis !== b.modis) return a.modis.localeCompare(b.modis);
+                let sA = parseInt(a.shelf), sB = parseInt(b.shelf);
+                if(!isNaN(sA) && !isNaN(sB) && sA !== sB) return sA - sB;
+                return String(a.shelf).localeCompare(String(b.shelf));
+            });
+            
+            let queueIds = [];
+            for (let item of allIncomplete) {
+                if (queueIds.length < maxItems) queueIds.push(item.id);
+                else break;
+            }
+            return queueIds;
+        }
+
         function bukaModalProgres() {
             const container = document.getElementById('listTargetHarian');
             const btnBox = document.getElementById('boxBtnTarget');
             const subtitle = document.getElementById('targetSubtitle');
             const today = getTodayString();
             
-            // Cek apakah ada barang target aktif di sistem (yg ditarik dari Google Sheets)
             let targetItems = dbBarang.filter(i => i.isTarget);
 
-            // JIKA TIDAK ADA TARGET AKTIF
             if (targetItems.length === 0) {
-                // Cek apakah HP ini sudah pernah me-generate target hari ini
                 let lastGen = localStorage.getItem('lastGenDate');
                 let allIncomplete = dbBarang.filter(i => (!i.expDate || i.expDate.trim() === "") && !i.isCalibrated);
                 
@@ -408,10 +460,8 @@
                     container.innerHTML = `<div class="empty-state">✨ Luar biasa! Semua barang di sistem sudah selesai dikelola. Progresmu 100%!</div>`;
                     btnBox.style.display = 'none';
                 } else if (lastGen !== today) {
-                    // Belum pernah generate hari ini di HP ini, buat otomatis!
                     return mintaTugasTambahan(true); 
                 } else {
-                    // Sudah generate hari ini & sudah habis dikerjakan
                     subtitle.style.display = 'none';
                     container.innerHTML = `
                         <div style="text-align:center; padding: 20px; background: rgba(16, 185, 129, 0.1); border: 1px dashed #10b981; border-radius: 10px;">
@@ -425,7 +475,6 @@
                     btnBox.innerHTML = `<button class="btn-primary" style="background: linear-gradient(135deg, #f59e0b, #d97706); font-size: 13px; padding: 12px;" onclick="mintaTugasTambahan(false)">➕ Minta Tambahan Tugas</button>`;
                 }
             } 
-            // JIKA ADA TARGET AKTIF
             else {
                 subtitle.style.display = 'block';
                 let grouped = {};
@@ -449,17 +498,13 @@
                 container.innerHTML = htmlStr;
                 btnBox.style.display = 'block';
                 btnBox.innerHTML = `<button class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-size: 14px; padding: 15px;" onclick="mulaiTargetHarian()">🚀 Mulai Kerjakan Target Ini (${targetItems.length})</button>`;
-                
                 localStorage.setItem('lastGenDate', today); 
             }
-            
             document.getElementById('modalProgres').classList.add('active');
         }
 
         function mintaTugasTambahan(isAuto = false) {
             let allIncomplete = dbBarang.filter(i => (!i.expDate || i.expDate.trim() === "") && !i.isCalibrated && !i.isTarget);
-            
-            // Mengurutkan berdasarkan Modis lalu Shelf
             allIncomplete.sort((a,b) => {
                 if(a.modis !== b.modis) return a.modis.localeCompare(b.modis);
                 let sA = parseInt(a.shelf), sB = parseInt(b.shelf);
@@ -467,23 +512,17 @@
                 return String(a.shelf).localeCompare(String(b.shelf));
             });
 
-            // Ambil maksimal 15 barang untuk dijadikan Target
             let count = 0;
             for (let item of allIncomplete) {
-                if (count < 15) {
-                    item.isTarget = true;
-                    count++;
-                } else {
-                    break;
-                }
+                if (count < 15) { item.isTarget = true; count++; } 
+                else break;
             }
 
-            localStorage.setItem('lastGenDate', getTodayString()); // Catat sudah generate di HP ini
-            
+            localStorage.setItem('lastGenDate', getTodayString()); 
             if (!isAuto) showToast(`Tugas tambahan ${count} barang berhasil dibuat! 📦`);
             
-            pushDataKeGoogleSheet(); // Simpan status isTarget ke cloud
-            bukaModalProgres(); // Refresh ulang modal
+            pushDataKeGoogleSheet(); 
+            bukaModalProgres(); 
         }
 
         function tutupModalProgres() { document.getElementById('modalProgres').classList.remove('active'); }
@@ -499,7 +538,6 @@
             showToast("Mode Target dibatalkan."); renderIncompleteItems();
         }
 
-        // --- FITUR IMPORT AI ---
         function toggleImportAI() {
             const box = document.getElementById('boxImportAI');
             box.style.display = box.style.display === 'none' ? 'block' : 'none';
@@ -516,8 +554,7 @@
                 dataAI.forEach(item => {
                     let indexAda = dbBarang.findIndex(b => b.modis === item.modis && String(b.shelf) === String(item.shelf) && b.baris === parseInt(item.baris));
                     if(indexAda !== -1) {
-                        dbBarang[indexAda].nama = item.nama.toUpperCase();
-                        countDiupdate++;
+                        dbBarang[indexAda].nama = item.nama.toUpperCase(); countDiupdate++;
                     } else {
                         dbBarang.push({
                             id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
@@ -531,39 +568,30 @@
 
                 document.getElementById('kodeAI').value = '';
                 toggleImportAI(); initApp(); pushDataKeGoogleSheet();
-                showToast(`Selesai! ${countBerhasil} Baru, ${countDiupdate} Diperbarui namanya 🚀`);
+                showToast(`Selesai! ${countBerhasil} Baru, ${countDiupdate} Diperbarui 🚀`);
             } catch(e) { alert("Gagal Import! Pastikan kode JSON yang dimasukkan benar."); }
         }
 
         function autoFixDobel() {
-            if(!confirm("Fitur ini akan menyatukan barang yang dobel di letak Rak & Baris yang sama.\n\nNama lama akan diganti nama resmi, TAPI tanggal expired lama akan dipertahankan.\n\nLanjutkan?")) return;
-            
+            if(!confirm("Menyatukan barang dobel di Rak & Baris sama. Lanjutkan?")) return;
             let lokasiMap = {}; let countDigabung = 0;
             let sortedDB = [...dbBarang].sort((a, b) => {
-                let aExp = (a.expDate && a.expDate !== "") ? 1 : 0;
-                let bExp = (b.expDate && b.expDate !== "") ? 1 : 0;
-                return bExp - aExp; 
+                let aExp = (a.expDate && a.expDate !== "") ? 1 : 0; let bExp = (b.expDate && b.expDate !== "") ? 1 : 0; return bExp - aExp; 
             });
 
             sortedDB.forEach(item => {
                 let key = `${item.modis}_${item.shelf}_${item.baris}`;
-                if (!lokasiMap[key]) {
-                    lokasiMap[key] = { ...item };
-                } else {
-                    countDigabung++;
-                    if(item.nama.length > 3) lokasiMap[key].nama = item.nama.toUpperCase();
-                    if(item.tarikDays && !lokasiMap[key].tarikDays) lokasiMap[key].tarikDays = item.tarikDays;
-                }
+                if (!lokasiMap[key]) { lokasiMap[key] = { ...item }; } 
+                else { countDigabung++; if(item.nama.length > 3) lokasiMap[key].nama = item.nama.toUpperCase(); }
             });
 
-            dbBarang = Object.values(lokasiMap);
-            initApp(); pushDataKeGoogleSheet();
+            dbBarang = Object.values(lokasiMap); initApp(); pushDataKeGoogleSheet();
             showToast(`Sapu Bersih Selesai! ${countDigabung} data dobel digabungkan.`);
         }
 
         function resetSemuaData() {
-            if (confirm("🚨 PERINGATAN BAHAYA 🚨\n\nApakah kamu YAKIN ingin MENGHAPUS SEMUA DATA BARANG?")) {
-                if (confirm("TINDAKAN INI TIDAK BISA DIBATALKAN!\n\nLanjutkan?")) {
+            if (confirm("🚨 PERINGATAN BAHAYA 🚨\nYAKIN MENGHAPUS SEMUA DATA?")) {
+                if (confirm("TINDAKAN INI TIDAK BISA DIBATALKAN!")) {
                     dbBarang = []; initApp(); showToast("Sapu jagat berhasil!"); pushDataKeGoogleSheet(); 
                 }
             }
@@ -644,7 +672,6 @@
             }
         }
 
-        // --- GRID SHELFING DINAMIS ---
         function toggleShelfDropdown() {
             const dd = document.getElementById('shelfDropdown');
             if(dd.style.display === 'flex') dd.style.display = 'none';
@@ -662,9 +689,7 @@
             if (currentInputMode === 'tgl') {
                 filteredDB = filteredDB.filter(b => (!b.expDate || b.expDate.trim() === "") && !b.isCalibrated);
                 formCustomShelf.style.display = 'none'; 
-            } else {
-                formCustomShelf.style.display = 'flex'; 
-            }
+            } else { formCustomShelf.style.display = 'flex'; }
 
             let unikShelf = [...new Set(filteredDB.map(b => String(b.shelf)))];
             if (currentInputMode === 'baru') {
@@ -686,9 +711,7 @@
                 });
                 htmlStr += '</div>';
             } else {
-                let pesanKosong = (currentInputMode === 'tgl') 
-                    ? '✨ Keren! Semua barang di modis ini sudah lengkap / dikalibrasi.' 
-                    : 'Belum ada rak tercatat untuk modis ini.';
+                let pesanKosong = (currentInputMode === 'tgl') ? '✨ Keren! Semua barang di modis ini sudah lengkap / dikalibrasi.' : 'Belum ada rak tercatat untuk modis ini.';
                 htmlStr += `<div style="font-size:11px; color:#94a3b8; text-align:center; padding:10px;">${pesanKosong}</div>`;
             }
 
@@ -697,8 +720,7 @@
                 customShelfList.forEach(s => {
                     if(s) {
                         if(!adaCustom) {
-                            hapusCustomHTML += '<div style="margin-top:10px; border-top:1px dashed #475569; padding-top:10px; font-size:11px; color:#cbd5e1;">Hapus Rak Kustom (Manual):</div><div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">';
-                            adaCustom = true;
+                            hapusCustomHTML += '<div style="margin-top:10px; border-top:1px dashed #475569; padding-top:10px; font-size:11px; color:#cbd5e1;">Hapus Rak Kustom (Manual):</div><div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">'; adaCustom = true;
                         }
                         hapusCustomHTML += `
                             <div style="display:flex; align-items:stretch; background:#0f172a; border:1px solid #334155; border-radius:6px; overflow:hidden;">
@@ -708,10 +730,8 @@
                         `;
                     }
                 });
-                if(adaCustom) hapusCustomHTML += '</div>';
-                htmlStr += hapusCustomHTML;
+                if(adaCustom) hapusCustomHTML += '</div>'; htmlStr += hapusCustomHTML;
             }
-
             container.innerHTML = htmlStr;
         }
 
@@ -731,8 +751,7 @@
         function hapusShelfPilihan(nama, event) {
             event.stopPropagation();
             if(confirm(`Yakin ingin menghapus rak kustom "${nama}"?`)) {
-                customShelfList = customShelfList.filter(s => s !== nama);
-                localStorage.setItem('returHubShelfList', JSON.stringify(customShelfList));
+                customShelfList = customShelfList.filter(s => s !== nama); localStorage.setItem('returHubShelfList', JSON.stringify(customShelfList));
                 if(pinnedShelf === nama) { pinnedShelf = ""; document.getElementById('shelf').value = ''; }
                 renderShelfGrid();
             }
@@ -745,70 +764,78 @@
             if (isSyncing) banner.classList.add('show'); else syncTimeout = setTimeout(() => { banner.classList.remove('show'); }, 1500);
         }
 
-        // --- TARIK DATA CLOUD & TERJEMAHKAN PESAN RAHASIA ---
         async function tarikDataGoogleSheet() {
             setSyncStatus(true, "Mengunduh pembaruan dari awan...");
             try {
-                const response = await fetch(URL_GOOGLE_SHEET);
-                let freshData = await response.json(); 
-                
+                const response = await fetch(URL_GOOGLE_SHEET); let freshData = await response.json(); 
                 let todayStr = getTodayString();
 
-                // TERJEMAHKAN PESAN RAHASIA DARI AWAN (CLOUD SYNC)
                 freshData.forEach(item => {
                     if (item.expDate === "KOSONG") {
-                        item.isCalibrated = true;
-                        item.isTarget = false;
-                        item.expDate = ""; 
+                        item.isCalibrated = true; item.isTarget = false; item.expDate = ""; 
                     } else if (item.expDate && item.expDate.startsWith("TARGET_")) {
                         let targetDate = item.expDate.split("_")[1];
-                        if (targetDate === todayStr) {
-                            item.isTarget = true;
-                            item.isCalibrated = false;
-                            item.expDate = "";
-                        } else {
-                            // Target basi (hari lalu), reset jadi barang biasa
-                            item.isTarget = false;
-                            item.isCalibrated = false;
-                            item.expDate = "";
-                        }
-                    } else {
-                        item.isCalibrated = false;
-                        item.isTarget = false;
-                    }
+                        if (targetDate === todayStr) { item.isTarget = true; item.isCalibrated = false; item.expDate = ""; } 
+                        else { item.isTarget = false; item.isCalibrated = false; item.expDate = ""; }
+                    } else { item.isCalibrated = false; item.isTarget = false; }
                 });
 
-                dbBarang = freshData;
-                localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
+                dbBarang = freshData; localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
                 syncModisList(); initApp();
                 if(currentInputMode === 'tgl') renderIncompleteItems();
                 setSyncStatus(false, "Sinkronisasi selesai! ✅");
             } catch (error) { setSyncStatus(false, "Mode Offline Aktif ⚠"); }
         }
 
-        // --- KIRIM DATA CLOUD & SEMBUNYIKAN PESAN RAHASIA ---
         async function pushDataKeGoogleSheet() {
             setSyncStatus(true, "Menyimpan perubahan ke awan...");
             try {
                 localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
-                
-                // Siapkan data kloningan untuk disusupi pesan rahasia
                 let payloadData = dbBarang.map(item => {
                     let clone = { ...item };
-                    if (clone.isCalibrated) {
-                        clone.expDate = "KOSONG";
-                    } else if (clone.isTarget) {
-                        clone.expDate = "TARGET_" + getTodayString();
-                    }
-                    // Hapus atribut sementara agar tidak bikin error GAS (opsional, tapi aman)
-                    delete clone.isCalibrated; 
-                    delete clone.isTarget;
-                    return clone;
+                    if (clone.isCalibrated) clone.expDate = "KOSONG";
+                    else if (clone.isTarget) clone.expDate = "TARGET_" + getTodayString();
+                    delete clone.isCalibrated; delete clone.isTarget; return clone;
                 });
-
                 await fetch(URL_GOOGLE_SHEET, { method: 'POST', body: JSON.stringify(payloadData) });
                 setSyncStatus(false, "Tersimpan aman! ✅");
             } catch (error) { setSyncStatus(false, "Gagal upload. Menunggu koneksi... ⚠"); }
+        }
+
+        // --- FUNGSI UPDATE CHART DASHBOARD & PROGRESS BAR ---
+        function updateDashboardChart() {
+            let countAman = 0, countTarik = 0, countExp = 0, countKosong = 0;
+            const today = new Date(); today.setHours(0,0,0,0);
+
+            dbBarang.forEach(item => {
+                if(item.isCalibrated) {
+                    countKosong++;
+                } else if (!item.expDate || item.expDate === "") {
+                    countKosong++; 
+                } else {
+                    let pDate = getPullDate(item.expDate, item.tarikDays);
+                    let sisaExp = hitungSelisihHari(item.expDate);
+                    let sisaTarik = Math.ceil((pDate - today) / (1000 * 60 * 60 * 24));
+                    if (sisaExp < 0) countExp++;
+                    else if (sisaTarik <= 0) countTarik++;
+                    else countAman++;
+                }
+            });
+            
+            let totalAll = countAman + countTarik + countExp + countKosong;
+            let pctAman = totalAll ? (countAman/totalAll)*100 : 0;
+            let pctTarik = totalAll ? (countTarik/totalAll)*100 : 0;
+            let pctExp = totalAll ? (countExp/totalAll)*100 : 0;
+            
+            let endAman = pctAman;
+            let endTarik = endAman + pctTarik;
+            let endExp = endTarik + pctExp;
+
+            document.getElementById('donutChart').style.background = `conic-gradient( #10b981 0% ${endAman}%, #f59e0b ${endAman}% ${endTarik}%, #ef4444 ${endTarik}% ${endExp}%, #64748b ${endExp}% 100% )`;
+            document.getElementById('lgAman').innerText = countAman;
+            document.getElementById('lgTarik').innerText = countTarik;
+            document.getElementById('lgExp').innerText = countExp;
+            document.getElementById('lgKosong').innerText = countKosong;
         }
 
         function updateProgressBar() {
@@ -823,16 +850,11 @@
             const textElement = document.getElementById('progressText');
             const headerCalibratedText = document.getElementById('headerCalibratedCount');
 
-            barElement.style.width = persentase + '%';
-            textElement.innerText = `${persentase}% (${barangDikelola}/${totalBarang})`;
+            barElement.style.width = persentase + '%'; textElement.innerText = `${persentase}% (${barangDikelola}/${totalBarang})`;
 
             if (headerCalibratedText) {
-                if (totalCalibrated > 0) {
-                    headerCalibratedText.innerText = `(${totalCalibrated} dikalibrasi)`;
-                    headerCalibratedText.style.display = 'inline';
-                } else {
-                    headerCalibratedText.style.display = 'none';
-                }
+                if (totalCalibrated > 0) { headerCalibratedText.innerText = `(${totalCalibrated} dikalibrasi)`; headerCalibratedText.style.display = 'inline'; } 
+                else { headerCalibratedText.style.display = 'none'; }
             }
 
             if (persentase < 30) barElement.style.background = 'linear-gradient(90deg, #dc2626, #ef4444)';
@@ -842,14 +864,14 @@
 
         function initApp() { 
             updateModisDatalist(); updateFilterDropdowns(); renderDashboard(); 
-            terapkanFilter(); updateProgressBar(); 
+            terapkanFilter(); updateProgressBar(); updateDashboardChart();
         }
 
         function switchTab(tabId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('page-' + tabId).classList.add('active'); event.target.classList.add('active');
-            if(tabId === 'dashboard') renderDashboard();
+            if(tabId === 'dashboard') { renderDashboard(); updateDashboardChart(); }
             if(tabId === 'list') { document.getElementById('searchInput').value = ''; document.getElementById('filterModis').value = ''; updateFilterShelf(); }
         }
 
@@ -862,14 +884,11 @@
             if(!tglString) return "-"; return new Date(tglString).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         }
 
-        function getPullDate(expDateStr, tarikDays) {
-            let d = new Date(expDateStr); d.setDate(d.getDate() - (tarikDays || 0)); return d;
-        }
+        function getPullDate(expDateStr, tarikDays) { let d = new Date(expDateStr); d.setDate(d.getDate() - (tarikDays || 0)); return d; }
 
         function hitungSelisihHari(tglTujuan) {
             if(!tglTujuan) return 9999;
-            const today = new Date(); today.setHours(0,0,0,0);
-            const target = new Date(tglTujuan); target.setHours(0,0,0,0);
+            const today = new Date(); today.setHours(0,0,0,0); const target = new Date(tglTujuan); target.setHours(0,0,0,0);
             return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
         }
 
@@ -886,8 +905,7 @@
             });
 
             ['nama','shelf','baris','expDate','tarikDays'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('modis').value = (pinnedModis !== "") ? pinnedModis : '';
-            document.getElementById('shelf').value = (pinnedShelf !== "") ? pinnedShelf : '';
+            document.getElementById('modis').value = (pinnedModis !== "") ? pinnedModis : ''; document.getElementById('shelf').value = (pinnedShelf !== "") ? pinnedShelf : '';
 
             showToast("Data barang tersimpan!"); initApp(); pushDataKeGoogleSheet();
         }
@@ -899,43 +917,35 @@
 
             let count = 0;
             checkboxes.forEach(cb => {
-                const id = cb.value;
-                const idx = dbBarang.findIndex(x => x.id === id);
+                const id = cb.value; const idx = dbBarang.findIndex(x => x.id === id);
                 if(idx > -1) { 
-                    dbBarang[idx].isCalibrated = true; 
-                    dbBarang[idx].isTarget = false; // Lepas dari target harian jika ada
+                    dbBarang[idx].isCalibrated = true; dbBarang[idx].isTarget = false; 
+                    if (!calibratedIds.includes(id)) calibratedIds.push(id);
                     count++; 
                 }
             });
-
-            showToast(`${count} barang dikalibrasi ✨`);
-            renderIncompleteItems(); initApp(); pushDataKeGoogleSheet();
+            localStorage.setItem('returHubCalibratedIds', JSON.stringify(calibratedIds));
+            showToast(`${count} barang dikalibrasi ✨`); renderIncompleteItems(); initApp(); pushDataKeGoogleSheet();
         }
 
         function resetKalibrasi() {
-            if(!confirm("Semua barang yang sebelumnya disembunyikan (dikalibrasi) akan dimunculkan kembali agar kamu bisa mengecek ketersediaan stok barunya.\n\nLanjutkan reset?")) return;
+            if(!confirm("Semua barang yang disembunyikan (dikalibrasi) akan dimunculkan kembali.\nLanjutkan reset?")) return;
             let count = 0;
-            dbBarang.forEach(item => {
-                if(item.isCalibrated) { item.isCalibrated = false; count++; }
-            });
-            showToast(`${count} barang dimunculkan kembali untuk dicek! 🔄`);
-            renderIncompleteItems(); initApp(); pushDataKeGoogleSheet();
+            dbBarang.forEach(item => { if(item.isCalibrated) { item.isCalibrated = false; count++; } });
+            
+            calibratedIds = []; localStorage.setItem('returHubCalibratedIds', JSON.stringify(calibratedIds));
+            showToast(`${count} barang dimunculkan kembali! 🔄`); renderIncompleteItems(); initApp(); pushDataKeGoogleSheet();
         }
 
-        // --- RENDER LIST DATA TGL EXPIRED ---
         function renderIncompleteItems() {
             const container = document.getElementById('incompleteItemsList'); let htmlStr = ''; 
             
             let allIncomplete = dbBarang.filter(i => (!i.expDate || i.expDate.trim() === "") && !i.isCalibrated);
             let globalCalibratedTotal = dbBarang.filter(i => (!i.expDate || i.expDate.trim() === "") && i.isCalibrated).length;
 
-            const boxReset = document.getElementById('boxResetKalibrasi');
-            const textJml = document.getElementById('textJmlKalibrasi');
-            if(globalCalibratedTotal > 0) {
-                boxReset.style.display = 'block'; textJml.innerText = globalCalibratedTotal;
-            } else {
-                boxReset.style.display = 'none';
-            }
+            const boxReset = document.getElementById('boxResetKalibrasi'); const textJml = document.getElementById('textJmlKalibrasi');
+            if(globalCalibratedTotal > 0) { boxReset.style.display = 'block'; textJml.innerText = globalCalibratedTotal; } 
+            else { boxReset.style.display = 'none'; }
 
             let incompleteToRender = [];
 
@@ -947,22 +957,16 @@
                 incompleteToRender = allIncomplete.filter(i => i.isTarget);
 
                 if (incompleteToRender.length === 0) {
-                    isTargetMode = false;
-                    showToast("🎉 LUUUAAAR BIASA! Target berhasil diselesaikan!");
-                    return renderIncompleteItems(); 
+                    isTargetMode = false; showToast("🎉 LUUUAAAR BIASA! Target berhasil diselesaikan!"); return renderIncompleteItems(); 
                 }
-            } 
-            else {
+            } else {
                 document.getElementById('lokasiInputArea').style.display = 'block';
                 document.getElementById('teksPanduanNormal').style.display = 'block';
                 document.getElementById('targetModeBanner').style.display = 'none';
 
-                let curModis = document.getElementById('modis').value; 
-                let curShelf = document.getElementById('shelf').value;
-
+                let curModis = document.getElementById('modis').value; let curShelf = document.getElementById('shelf').value;
                 if (curModis) allIncomplete = allIncomplete.filter(i => i.modis === curModis);
                 if (curShelf) allIncomplete = allIncomplete.filter(i => String(i.shelf) === String(curShelf));
-                
                 incompleteToRender = allIncomplete;
             }
 
@@ -998,10 +1002,12 @@
             const idx = dbBarang.findIndex(x => x.id === id);
             if(idx > -1) {
                 dbBarang[idx].expDate = tgl; dbBarang[idx].tarikDays = parseInt(tarik);
-                dbBarang[idx].isCalibrated = false; 
-                dbBarang[idx].isTarget = false; 
-                showToast('Tanggal Expired Terkunci! ✅'); 
+                dbBarang[idx].isCalibrated = false; dbBarang[idx].isTarget = false; 
                 
+                calibratedIds = calibratedIds.filter(cid => cid !== id);
+                localStorage.setItem('returHubCalibratedIds', JSON.stringify(calibratedIds));
+
+                showToast('Tanggal Expired Terkunci! ✅'); 
                 renderIncompleteItems(); initApp(); pushDataKeGoogleSheet();
             }
         }
@@ -1030,10 +1036,10 @@
                 dbBarang[index].baris = parseInt(newBaris); dbBarang[index].expDate = newExp || ""; dbBarang[index].tarikDays = parseInt(newTarik) || 60;
                 
                 if (newExp) {
-                    dbBarang[index].isCalibrated = false; 
-                    dbBarang[index].isTarget = false; 
+                    dbBarang[index].isCalibrated = false; dbBarang[index].isTarget = false; 
+                    calibratedIds = calibratedIds.filter(cid => cid !== id);
+                    localStorage.setItem('returHubCalibratedIds', JSON.stringify(calibratedIds));
                 }
-
                 tutupModal(); initApp(); showToast("Pembaruan berhasil!"); pushDataKeGoogleSheet();
             }
         }
@@ -1045,18 +1051,14 @@
             }
         }
 
-        // --- DASHBOARD: PLANNING & COUNTDOWN ---
         function setDashFilter(filterKey) { currentDashFilter = filterKey; renderDashboard(); }
 
         function renderDashboard() {
-            const listContainer = document.getElementById('actionList'); 
-            const filterContainer = document.getElementById('dashMonthFilters');
-            const totalBadge = document.getElementById('dashTotalBadge');
-            let htmlStr = ''; 
+            const listContainer = document.getElementById('actionList'); const filterContainer = document.getElementById('dashMonthFilters');
+            const totalBadge = document.getElementById('dashTotalBadge'); let htmlStr = ''; 
             
             let itemsWithExp = dbBarang.filter(i => i.expDate && i.expDate.trim() !== "");
-            let futureMonths = new Set();
-            const today = new Date(); today.setHours(0,0,0,0);
+            let futureMonths = new Set(); const today = new Date(); today.setHours(0,0,0,0);
 
             let dataWithPullInfo = itemsWithExp.map(item => {
                 let pDate = getPullDate(item.expDate, item.tarikDays);
@@ -1149,27 +1151,22 @@
 
         function terapkanFilter() {
             const query = document.getElementById('searchInput').value.toLowerCase(); 
-            const fModis = document.getElementById('filterModis').value; 
-            const fShelf = document.getElementById('filterShelf').value;
+            const fModis = document.getElementById('filterModis').value; const fShelf = document.getElementById('filterShelf').value;
             const listContainer = document.getElementById('allList'); let htmlStr = ''; 
 
             let dataSaring = dbBarang.filter(item => {
-                return item.nama.toLowerCase().includes(query) && 
-                       (fModis === '' || item.modis === fModis) && 
-                       (fShelf === '' || String(item.shelf) === fShelf);
+                return item.nama.toLowerCase().includes(query) && (fModis === '' || item.modis === fModis) && (fShelf === '' || String(item.shelf) === fShelf);
             });
 
             document.getElementById('totalBarang').innerText = dataSaring.length;
 
-            const btnTutup = document.getElementById('btnTutupDataTop');
-            const btnLihat = document.getElementById('btnLihatSemuaBottom');
+            const btnTutup = document.getElementById('btnTutupDataTop'); const btnLihat = document.getElementById('btnLihatSemuaBottom');
             let dataToRender = [];
 
             if (fModis === '' && fShelf === '' && query === '') {
                 dataSaring.sort((a, b) => b.id.localeCompare(a.id)); 
                 if (!isExpandedView && dataSaring.length > 5) {
-                    dataToRender = dataSaring.slice(0, 5);
-                    btnLihat.style.display = 'block'; btnTutup.style.display = 'none';
+                    dataToRender = dataSaring.slice(0, 5); btnLihat.style.display = 'block'; btnTutup.style.display = 'none';
                 } else {
                     dataToRender = dataSaring;
                     if (dataSaring.length > 5) { btnLihat.style.display = 'none'; btnTutup.style.display = 'block'; } 
@@ -1183,8 +1180,7 @@
                     if(String(a.shelf) !== String(b.shelf)) return String(a.shelf).localeCompare(String(b.shelf));
                     return a.baris - b.baris;
                 });
-                dataToRender = dataSaring;
-                btnLihat.style.display = 'none'; btnTutup.style.display = 'none'; isExpandedView = false;
+                dataToRender = dataSaring; btnLihat.style.display = 'none'; btnTutup.style.display = 'none'; isExpandedView = false;
             }
 
             if(dataToRender.length === 0) { listContainer.innerHTML = `<div class="empty-state">Data tidak ditemukan.</div>`; return; }
@@ -1215,3 +1211,4 @@
     </script>
 </body>
 </html>
+

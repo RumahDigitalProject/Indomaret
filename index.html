@@ -184,9 +184,10 @@
         <div id="page-dashboard" class="page active">
             <div class="card">
                 
-                <div id="boxNotifSetup" style="display: none; margin-bottom: 15px; padding: 10px; background: rgba(59, 130, 246, 0.15); border: 1px dashed #3b82f6; border-radius: 10px; text-align: center;">
-                    <p style="font-size: 11px; color: #bfdbfe; margin: 0 0 8px 0;">Biar HP kamu bisa kasih peringatan otomatis barang yang mau ditarik, aktifkan notifikasi ya!</p>
-                    <button class="btn-action" style="background: #2563eb; padding: 8px 15px;" onclick="mintaIzinNotif()">🔔 Aktifkan Notif Sistem</button>
+                <div id="boxNotifSetup" style="display: none; margin-bottom: 15px; padding: 15px; background: rgba(59, 130, 246, 0.15); border: 1px dashed #3b82f6; border-radius: 10px; text-align: center;">
+                    <p id="notifText" style="font-size: 11px; color: #bfdbfe; margin: 0 0 10px 0;">Biar HP kamu bisa kasih peringatan otomatis, aktifkan notifikasi ya!</p>
+                    <button id="btnAktifNotif" class="btn-action" style="background: #2563eb; padding: 8px 15px;" onclick="mintaIzinNotif()">🔔 Aktifkan Notif Sistem</button>
+                    <button id="btnTesNotif" class="btn-action" style="background: #f59e0b; padding: 8px 15px; display: none;" onclick="tesNotifManual()">🧪 Tes Notif Sekarang</button>
                 </div>
 
                 <div class="chart-container">
@@ -374,7 +375,7 @@
     <div id="toast">Notifikasi</div>
 
     <script>
-        // --- SETUP PWA (APP INSTALLER) ---
+        // --- SETUP PWA & SERVICE WORKER (APP INSTALLER) ---
         function setupPWA() {
             const manifest = {
                 name: "ReturHub Inventory",
@@ -388,8 +389,21 @@
             const manifestURL = URL.createObjectURL(manifestBlob);
             document.getElementById('pwaManifest').setAttribute('href', manifestURL);
 
+            // Mendaftarkan Service Worker pintar untuk urusan Push Notif
             if ('serviceWorker' in navigator) {
-                const swCode = "self.addEventListener('fetch', function(e) { });";
+                const swCode = `
+                    self.addEventListener('fetch', function(e) { });
+                    self.addEventListener('notificationclick', function(e) {
+                        e.notification.close();
+                        e.waitUntil(clients.matchAll({ type: 'window' }).then(clientsArr => {
+                            if (clientsArr.length > 0) {
+                                clientsArr[0].focus();
+                            } else {
+                                clients.openWindow('/');
+                            }
+                        }));
+                    });
+                `;
                 const swBlob = new Blob([swCode], {type: 'application/javascript'});
                 const swURL = URL.createObjectURL(swBlob);
                 navigator.serviceWorker.register(swURL).catch(err => console.log('PWA SW failed', err));
@@ -400,17 +414,12 @@
         
         let dbBarang = JSON.parse(localStorage.getItem('returHubCache')) || [];
         let customModisList = JSON.parse(localStorage.getItem('returHubModisList')) || [];
-        let pinnedModis = ""; 
-        let customShelfList = JSON.parse(localStorage.getItem('returHubShelfList')) || [];
-        let pinnedShelf = ""; 
-        let currentInputMode = 'baru'; 
-        
-        let isExpandedView = false;
-        let currentDashFilter = 'segera'; 
+        let pinnedModis = ""; let customShelfList = JSON.parse(localStorage.getItem('returHubShelfList')) || [];
+        let pinnedShelf = ""; let currentInputMode = 'baru'; 
+        let isExpandedView = false; let currentDashFilter = 'segera'; 
 
         // VARIABEL GLOBAL
-        let isTargetMode = false;
-        let targetModeIds = []; 
+        let isTargetMode = false; let targetModeIds = []; 
         let calibratedIds = JSON.parse(localStorage.getItem('returHubCalibratedIds')) || [];
 
         window.onload = () => { 
@@ -432,29 +441,65 @@
             return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,'0') + "-" + String(d.getDate()).padStart(2,'0');
         }
 
-        // --- FITUR BARU: NOTIFIKASI SISTEM (ASISTEN PAGI) ---
+        // --- FITUR BARU: MESIN NOTIFIKASI PINTAR ---
         function cekStatusNotif() {
             if (!("Notification" in window)) return;
             const notifBox = document.getElementById('boxNotifSetup');
-            if (Notification.permission === "default") {
-                notifBox.style.display = 'block';
+            const btnAktif = document.getElementById('btnAktifNotif');
+            const btnTes = document.getElementById('btnTesNotif');
+            const notifText = document.getElementById('notifText');
+            
+            notifBox.style.display = 'block'; 
+            
+            if (Notification.permission === "granted") {
+                btnAktif.style.display = 'none';
+                btnTes.style.display = 'inline-block';
+                notifText.innerText = "Sistem Notifikasi AKTIF ✅\nCoba tes untuk memastikan HP-mu bergetar.";
+                notifText.style.color = "#34d399";
             } else {
-                notifBox.style.display = 'none';
+                btnAktif.style.display = 'inline-block';
+                btnTes.style.display = 'none';
+                notifText.innerText = "Biar HP kamu bisa kasih peringatan otomatis barang expired, aktifkan notifikasi ya!";
+                notifText.style.color = "#bfdbfe";
             }
         }
 
         function mintaIzinNotif() {
             if (!("Notification" in window)) {
-                alert("Sayang sekali, browser HP-mu belum support notifikasi sistem.");
-                return;
+                alert("Sayang sekali, browser HP-mu belum support notifikasi sistem."); return;
             }
             Notification.requestPermission().then(permission => {
                 cekStatusNotif();
                 if(permission === 'granted') {
                     showToast("Mantap! Notifikasi berhasil diaktifkan 🔔");
-                    periksaNotifikasiHarian(true); // Paksa cek saat baru diizinkan
+                    periksaNotifikasiHarian(true); 
                 }
             });
+        }
+
+        // Fungsi rahasia agar notifikasi pasti jalan di Android/iOS
+        function kirimNotifikasi(judul, pesan) {
+            const options = {
+                body: pesan,
+                icon: "https://cdn-icons-png.flaticon.com/512/2897/2897785.png",
+                vibrate: [200, 100, 200, 100, 200], // Pola getar SOS
+                requireInteraction: true // Notifikasi tetap ada sampai digeser user
+            };
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(function(registration) {
+                    registration.showNotification(judul, options);
+                }).catch(function() {
+                    new Notification(judul, options); // Cadangan
+                });
+            } else {
+                new Notification(judul, options); // Cadangan 2
+            }
+        }
+
+        function tesNotifManual() {
+            kirimNotifikasi("🚨 Tes ReturHub Berhasil!", "Mantap partner! Sistem notifikasi di HP kamu sudah berjalan normal 🚀");
+            showToast("Mengirim notifikasi tes...");
         }
 
         function periksaNotifikasiHarian(force = false) {
@@ -463,10 +508,8 @@
             const todayStr = getTodayString();
             const lastNotif = localStorage.getItem('returHubLastNotifDate');
             
-            // Cek apakah sudah diingatkan hari ini
             if (lastNotif !== todayStr || force) {
-                const today = new Date();
-                today.setHours(0,0,0,0);
+                const today = new Date(); today.setHours(0,0,0,0);
                 
                 let countTarik = 0;
                 dbBarang.forEach(item => {
@@ -478,23 +521,10 @@
                 });
 
                 if (countTarik > 0) {
-                    const title = "🚨 Waktunya Tarik Barang!";
-                    const options = {
-                        body: `Bos, ada ${countTarik} barang yang harus segera ditarik dari rak hari ini. Yuk cek aplikasi ReturHub!`,
-                        icon: "https://cdn-icons-png.flaticon.com/512/2897/2897785.png",
-                        vibrate: [200, 100, 200] // Efek getar di HP
-                    };
-
-                    const notif = new Notification(title, options);
-                    
-                    // Kalau notifikasi diklik, langsung arahkan ke tab Dashboard
-                    notif.onclick = function() {
-                        window.focus();
-                        switchTab('dashboard');
-                        setDashFilter('segera');
-                        notif.close();
-                    };
-
+                    kirimNotifikasi(
+                        "🚨 Waktunya Tarik Barang!", 
+                        `Bos, ada ${countTarik} barang yang harus segera ditarik dari rak hari ini. Yuk cek aplikasi ReturHub!`
+                    );
                     localStorage.setItem('returHubLastNotifDate', todayStr);
                 }
             }
@@ -859,7 +889,6 @@
                 dbBarang = freshData; localStorage.setItem('returHubCache', JSON.stringify(dbBarang));
                 syncModisList(); initApp();
                 
-                // Memicu notifikasi setelah data paling segar didapat
                 periksaNotifikasiHarian();
 
                 if(currentInputMode === 'tgl') renderIncompleteItems();
@@ -882,7 +911,6 @@
             } catch (error) { setSyncStatus(false, "Gagal upload. Menunggu koneksi... ⚠"); }
         }
 
-        // --- FUNGSI UPDATE CHART DASHBOARD & PROGRESS BAR ---
         function updateDashboardChart() {
             let countAman = 0, countTarik = 0, countExp = 0, countKosong = 0;
             const today = new Date(); today.setHours(0,0,0,0);
